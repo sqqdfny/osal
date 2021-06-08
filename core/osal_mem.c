@@ -42,16 +42,24 @@ void * OsalMemAlloc(size_t size_req)
 			prev->mem.next->next = p->mem.next;
 			prev->mem.next->size = p->mem.size - (size_req + sizeof(osal_mem_head_t));
 			p->mem.size = size_req;
+			if(p == g_pMemHead)
+			{
+				g_pMemHead = (osal_mem_head_t*)(prev->mem.next);
+			}
 			OsalMemExitCritical();
-			OsalMemDebugPrintf("%s: 0x%08lx\n", __func__, (size_t)(p + 1));
+			OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx\n", __func__, (size_t)(p + 1), (size_t)(g_pMemHead));
 			return (p + 1);
 		}
 		else
 		if(p->mem.size >= (size_req + sizeof(osal_mem_head_t)))
 		{
 			prev->mem.next = p->mem.next;
+			if(p == g_pMemHead)
+			{
+				g_pMemHead = (osal_mem_head_t*)(prev->mem.next);
+			}
 			OsalMemExitCritical();
-			OsalMemDebugPrintf("%s: 0x%08lx\n", __func__, (size_t)(p + 1));
+			OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx\n", __func__, (size_t)(p + 1), (size_t)(g_pMemHead));
 			return (p + 1);
 		}
 		else
@@ -72,7 +80,7 @@ void OsalMemFree(void* pMem)
 	osal_mem_head_t *p, *prev;
 	p = (osal_mem_head_t*)pMem;
 	p --;
-    OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx  0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(g_pMemHead));
+    OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx  0x%08lx\n", __func__, (size_t)(p + 1), p->mem.size, (size_t)(g_pMemHead));
 	OsalMemEnterCritical();
 	if(p < g_pMemHead)
 	{
@@ -91,12 +99,14 @@ void OsalMemFree(void* pMem)
 			prev->mem.next = (osal_mem_t*)p;
 			if(prev->mem.size == (((uint8_t*)p) - ((uint8_t*)prev)))
 			{
+				OsalMemDebugPrintf("%s: merge prev 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(prev), prev->mem.size, (size_t)(p));
 				prev->mem.size += p->mem.size + sizeof(osal_mem_head_t);
 				prev->mem.next = p->mem.next;
 			}
 
 			if(prev->mem.size == (((uint8_t*)prev->mem.next) - ((uint8_t*)prev)))
 			{
+				OsalMemDebugPrintf("%s: merge next 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(prev), prev->mem.size, (size_t)(prev->mem.next));
 				prev->mem.size += prev->mem.next->size + sizeof(osal_mem_head_t);
 				prev->mem.next = prev->mem.next->next;
 			}
