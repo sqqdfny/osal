@@ -2,7 +2,7 @@
 
 DIR_CROSS =
 C_CC = $(DIR_CROSS)gcc
-C_FLAGS = $(DEBUG) -Wall
+C_FLAGS = $(DEBUG) -Wall -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 
 
 DirRoot    = ../

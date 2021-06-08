@@ -1,6 +1,6 @@
 /**
  * @file osal_timer.c
- * @brief 硬件定时器实现，为osal操作系统提供系统滴答心跳时钟，移植时需要修改该文件
+ * @brief OSAL对外提供的定时器接口
  * @date 2021-06-08
  * @author sqqdfny
  */
@@ -46,10 +46,12 @@ static void TimerFree(osal_timer_t * pTimer)
             if((NULL == pPrev) || (pTimer == pPrev->next)) break;
             pPrev = pPrev->next;
         }while(1);
-        if(NULL != pPrev)
+        if(NULL == pPrev)
         {
-            pPrev->next = pTimer->next;
+            OsalDebugErr("%s not find: %08x\n", __func__, (uint32_t)pTimer);
+            return;
         }
+        pPrev->next = pTimer->next;
     }
     pTimer->next = g_pFreeTimerList;
     g_pFreeTimerList = pTimer;
@@ -68,7 +70,10 @@ OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint3
     pTimer->param = param;
     pTimer->reload_timeout = (osal_timer_type_period == type) ? timeout : 0;
     pTimer->is_running = true;
-    *ppTimer = pTimer;
+    if(ppTimer)
+    {
+        *ppTimer = pTimer;
+    }
     AddTimerToUsedList(pTimer);
     return OSAL_ERR_SUCC;
 }

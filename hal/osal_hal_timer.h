@@ -32,6 +32,11 @@ void OsalHalTimerTickStart(void);
  * @brief 关闭硬件定时器，为空则一直不关闭
  */
 void OsalHalTimerTickStop(void);
+
+/**
+ * @brief 没有任务执行时CPU调用的函数
+ */
+void OsalHalt(void);
 //==================================================================================================
 #ifdef __cplusplus
 }

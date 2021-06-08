@@ -4,7 +4,7 @@
 #ifndef __OSAL_API_H__
 #define __OSAL_API_H__
 
-#include "osal_task.h"
+#include "osal.h"
 
 #ifdef __cplusplus
 extern "C"

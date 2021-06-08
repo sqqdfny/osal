@@ -3,7 +3,7 @@
 #ifndef __OSAL_TIMER_H__
 #define __OSAL_TIMER_H__
 
-#include "osal_task.h"
+#include "osal.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -16,9 +16,9 @@ typedef enum
     osal_timer_type_one_shot,
 }osal_timer_type_t;
 
-typedef struct osal_timer
+typedef struct OSAL_TIMER_T
 {
-    struct osal_timer *next;
+    struct OSAL_TIMER_T *next;
     uint32_t timeout;               //ms
     uint32_t reload_timeout;        //0表示是单次定时器
     void *param;
