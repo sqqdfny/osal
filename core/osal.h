@@ -6,6 +6,7 @@
 
 #include "osal_typedef.h"
 #include "osal_timer.h"
+#include "osal_mem.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -20,7 +21,15 @@ OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events);
 
 OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events));
 void OsalStartSystem(void);
-void OsalInitSystem(void);
+
+
+/**
+ * @brief OSAL系统初始化,
+ *        传入的参数为内存管理的内存块地址和SIZE
+ *        传入的addr要注意对齐的问题
+ *        如果不使用 msg_queue, 同时用户也不调用内存管理相关的函数, 可以传入NULL
+ */
+void OsalInitSystem(uint32_t * addr, size_t size_bytes);
 //==================================================================================================
 #ifdef __cplusplus
 }

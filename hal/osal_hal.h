@@ -20,6 +20,9 @@ extern "C"
  */
 #define OSAL_HAL_ENTER_CRITICAL()  
 #define OSAL_HAL_EXIT_CRITICAL()   
+
+
+#define OSAL_HAL_REBOOT() 
 //==================================================================================================
 /**
  * @brief 获取当前的tick值

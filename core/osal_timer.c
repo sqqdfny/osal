@@ -81,6 +81,12 @@ OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint3
     return OSAL_ERR_SUCC;
 }
 
+void * OsalTimerGetParam(osal_timer_t *pTimer)
+{
+    if(NULL == pTimer) return NULL;
+    return pTimer->param;
+}
+
 OSAL_ERR_T OsalDeleteTimer(osal_timer_t *pTimer)
 {
     if(NULL == pTimer) return OSAL_ERR_INVALID_HANDLE;

@@ -59,6 +59,9 @@ typedef enum
 #define OSAL_EVENT_MSG     OSAL_BIT31
 
 
+#ifndef NULL
+	#define NULL 	0
+#endif
 //==================================================================================================
 typedef uint32_t osal_ucpu_t;   //与处理器位宽相同的类型
 typedef uint32_t osal_task_id_t;

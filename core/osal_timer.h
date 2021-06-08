@@ -28,6 +28,7 @@ typedef struct OSAL_TIMER_T
 
 
 OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param), void *param);
+void * OsalTimerGetParam(osal_timer_t *pTimer);
 OSAL_ERR_T OsalDeleteTimer(osal_timer_t *pTimer);
 OSAL_ERR_T OsalTimerStart(osal_timer_t *pTimer);
 OSAL_ERR_T OsalTimerStop(osal_timer_t *pTimer);

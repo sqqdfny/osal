@@ -8,6 +8,7 @@
 #include "osal.h"
 #include "osal_config.h"
 #include "osal_timer.h"
+#include "osal_mem.h"
 #include "../hal/osal_hal.h"
 
 typedef struct 
@@ -101,9 +102,16 @@ void OsalStartSystem(void)
     }while(1);
 }
 
-void OsalInitSystem(void)
+/**
+ * @brief OSAL系统初始化,
+ *        传入的参数为内存管理的内存块地址和SIZE
+ *        传入的addr要注意对齐的问题
+ *        如果不使用 msg_queue, 同时用户也不调用内存管理相关的函数, 可以传入NULL
+ */
+void OsalInitSystem(uint32_t * addr, size_t size_bytes)
 {
     int i;
+    OsalEnterCritical();
     g_cur_task_total = 0;
     for(i = 0; i < OSAL_TASK_TOTAL; i ++)
     {
@@ -111,7 +119,9 @@ void OsalInitSystem(void)
         g_osal_tcb_list[i].events = 0;
     }
 
+    OsalMemInit(addr, size_bytes);
     OsalTimerInit();
+    OsalExitCritical();
 }
 //==================================================================================================
 //end files
