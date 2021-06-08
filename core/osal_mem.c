@@ -67,9 +67,46 @@ void * OsalMemAlloc(size_t size_req)
 	return NULL;
 }
 
-void OsalMemFree(void* p)
+void OsalMemFree(void* pMem)
 {
-	
+	osal_mem_head_t *p, *prev;
+	p = (osal_mem_head_t*)pMem;
+	p --;
+    OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx  0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(g_pMemHead));
+	OsalMemEnterCritical();
+	if(p < g_pMemHead)
+	{
+		p->mem.next = g_pMemHead->mem.next;
+		p->mem.size += g_pMemHead->mem.size + sizeof(osal_mem_head_t);
+		g_pMemHead = p;
+		OsalMemExitCritical();
+		return;
+	}
+
+    prev = g_pMemHead;
+	do{
+		if(p < (osal_mem_head_t*)(prev->mem.next))
+		{
+			p->mem.next = prev->mem.next;
+			prev->mem.next = (osal_mem_t*)p;
+			if(prev->mem.size == (((uint8_t*)p) - ((uint8_t*)prev)))
+			{
+				prev->mem.size += p->mem.size + sizeof(osal_mem_head_t);
+				prev->mem.next = p->mem.next;
+			}
+
+			if(prev->mem.size == (((uint8_t*)prev->mem.next) - ((uint8_t*)prev)))
+			{
+				prev->mem.size += prev->mem.next->size + sizeof(osal_mem_head_t);
+				prev->mem.next = prev->mem.next->next;
+			}
+			OsalMemExitCritical();
+			return;
+		}
+		prev = (osal_mem_head_t*)prev->mem.next;
+	}while(NULL != prev);
+	OsalMemExitCritical();
+	OsalDebugErr("%s err\n", __func__);
 }
 
 /**
