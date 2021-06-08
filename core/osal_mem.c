@@ -5,170 +5,84 @@
 
 
 
-typedef osal_ucpu_t portHeap;
 //===================================================================
 
-#define HeapEnterCritical()			OsalEnterCritical()		
-#define HeapExitCritical()			OsalExitCritical()		
+#define OsalMemEnterCritical()			  OsalEnterCritical()		
+#define OsalMemExitCritical()			  OsalExitCritical()		
+#define OsalMemDebugPrintf(fmt, args...)  OsalDebugInfo(fmt, ##args)
 				
-#define HEAP_ALIGNMENT				4
-#define HEAP_ALIGNMENT_MASK			0x00000003UL
+#define HEAP_ALIGNMENT				8
 
-typedef struct HEAP
+typedef struct OSAL_MEM_T
 {
-	struct HEAP * pNext;
-	portHeap size;
-}struct_HEAP;
+	struct OSAL_MEM_T *next;
+	size_t size;
+}osal_mem_t;
 
-static struct_HEAP *g_pHeapStart;
-static uint32_t g_freeSize = 0;
+typedef union
+{
+	osal_mem_t mem;
+	uint8_t reserved[sizeof(osal_mem_t) > HEAP_ALIGNMENT ? ((sizeof(osal_mem_t) + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1)) : HEAP_ALIGNMENT];
+}osal_mem_head_t;
+
+
+static osal_mem_head_t *g_pMemHead;
 //==================================================================================================
-uint32_t OsalGetFreeHeapSize(void)
+void * OsalMemAlloc(size_t size_req)
 {
-	return (g_freeSize);
-}
+	osal_mem_head_t *p, *prev;
 
-void * OsalMemAlloc(uint32_t size_req)
-{
-	struct_HEAP *pHeap1, *pHeap2, *pHeap3;
-	void *pReturn;
-	
-	if(0 == size_req) return NULL;
-	
-	HeapEnterCritical();
-	
-	size_req = (size_req + HEAP_ALIGNMENT - 1) & (~HEAP_ALIGNMENT_MASK);
-	
-	pHeap1 = g_pHeapStart;
-	pHeap3 = g_pHeapStart;
-	
-	while (1)
-	{
-		if(pHeap1->size >= size_req)
-		{//当前的空闲块 >= 请求的块
-			pReturn = (void*)pHeap1;
-			if(pHeap1->size > (size_req + sizeof(struct_HEAP)))
-			{
-				pHeap2 = (struct_HEAP*)( ((portHeap)pHeap1) + size_req + HEAP_ALIGNMENT);
-				pHeap2->pNext = pHeap1->pNext;
-				pHeap2->size = pHeap1->size - size_req - HEAP_ALIGNMENT;
-				pHeap3->pNext = pHeap2;
-				
-				if(pReturn == (void*)g_pHeapStart)
-				{
-					g_pHeapStart = pHeap2;
-				}
-				
-				*((portHeap*)pReturn) = size_req;
-				g_freeSize = g_freeSize - (size_req + sizeof(struct_HEAP));
-				pReturn = (void*)(((portHeap)pReturn) + HEAP_ALIGNMENT);
-			}
-			else
-			{
-				pHeap3->pNext = pHeap1->pNext;
-	
-				if(pReturn == (void*)g_pHeapStart)
-				{
-					g_pHeapStart = pHeap3->pNext;
-				}
-				
-				*((portHeap*)pReturn) = pHeap1->size;
-				g_freeSize = g_freeSize - ((pHeap1->size) + sizeof(struct_HEAP));
-				pReturn = (void*)( ((portHeap)pReturn) + HEAP_ALIGNMENT);
-			}
-			
-			HeapExitCritical();
-			return pReturn; 
+	OsalMemEnterCritical();
+	p = g_pMemHead;
+	prev = p;
+	do{
+		if(p->mem.size > (size_req + sizeof(osal_mem_head_t) * 2))
+		{
+			prev->mem.next = (osal_mem_t*)(((uint8_t*)(p + 1)) + size_req);
+			prev->mem.next->next = p->mem.next;
+			prev->mem.next->size = p->mem.size - (size_req + sizeof(osal_mem_head_t));
+			p->mem.size = size_req;
+			OsalMemExitCritical();
+			OsalMemDebugPrintf("%s: 0x%08lx\n", __func__, (size_t)(p + 1));
+			return (p + 1);
 		}
-			
-		if(NULL == pHeap1->pNext) 
-		{//已经到最后一个空闲的块
-			HeapExitCritical();
-			OsalDebugErr("%s\n", __func__);
-			return NULL;
-		} 
-		
-		pHeap3 = pHeap1;
-		pHeap1 = pHeap1->pNext;		//查找下一个空闲块
-	}
+		else
+		if(p->mem.size >= (size_req + sizeof(osal_mem_head_t)))
+		{
+			prev->mem.next = p->mem.next;
+			OsalMemExitCritical();
+			OsalMemDebugPrintf("%s: 0x%08lx\n", __func__, (size_t)(p + 1));
+			return (p + 1);
+		}
+		else
+		{
+			if(p != g_pMemHead)
+			{
+				prev = p;
+			}
+			p = (osal_mem_head_t*)(p->mem.next);
+		}
+	}while(NULL != p->mem.next);
+	OsalMemExitCritical();
+	return NULL;
 }
 
 void OsalMemFree(void* p)
 {
-	struct_HEAP *pHeap1, *pHeap2, *pHeap3;
 	
-	if(NULL == p) return;
-	
-	HeapEnterCritical();	
-	
-	p = (void*)( ((portHeap)p) - HEAP_ALIGNMENT);
-	g_freeSize = g_freeSize + (((struct_HEAP*)p)->size) + sizeof(struct_HEAP);
-	if(p < (void*)g_pHeapStart) 
-	{
-		pHeap1 = (struct_HEAP*)p;
-		pHeap3 = g_pHeapStart;
-		pHeap1->size = *((portHeap*)p);
-		if( ( ((portHeap)pHeap1) + pHeap1->size + HEAP_ALIGNMENT) == (portHeap)pHeap3)
-		{
-			pHeap1->pNext = pHeap3->pNext;
-			pHeap1->size += pHeap3->size + HEAP_ALIGNMENT;
-		}
-		else
-		{
-			pHeap1->pNext = pHeap3;
-		}
-		g_pHeapStart = pHeap1;
-	}
-	else
-	{
-		pHeap1 = g_pHeapStart;
-		pHeap3 = g_pHeapStart;
-		
-		while(p > (void*)pHeap1)
-		{
-			if(NULL == pHeap1->pNext) 
-			{
-			    OSAL_HAL_REBOOT();
-			}
-			pHeap3 = pHeap1;
-			pHeap1 = pHeap1->pNext;		//查找下一个空闲块
-		}
-	
-		pHeap2 = (struct_HEAP*)p;
-		pHeap2->size = *((portHeap*)p);
-		if( ( ((portHeap)pHeap2) + pHeap2->size + HEAP_ALIGNMENT) == ((portHeap)pHeap1) )
-		{
-			pHeap2->size += pHeap1->size + HEAP_ALIGNMENT;
-			pHeap2->pNext = pHeap1->pNext;
-		}
-		else
-		{
-			pHeap2->pNext = pHeap1;
-		}
-		
-		if( ( ((portHeap)pHeap3) + pHeap3->size + HEAP_ALIGNMENT) == ((portHeap)pHeap2) )
-		{
-			pHeap3->size += pHeap2->size + HEAP_ALIGNMENT;
-			pHeap3->pNext = pHeap2->pNext;
-		}
-		else
-		{
-			pHeap3->pNext = pHeap2;
-		}
-	}
-	HeapExitCritical();
 }
 
 /**
- * @brief 内存管理初始化,传入的addr要注意对齐的问题
+ * @brief 内存管理初始化,
+ *        传入的addr要注意对齐的问题,必须按HEAP_ALIGNMENT对齐
  */
 void OsalMemInit(uint32_t * addr, size_t size_bytes)
 {	
     if(NULL == addr) return;
-	g_pHeapStart = (struct_HEAP *)addr;
-	g_pHeapStart->pNext = NULL;
-	g_pHeapStart->size = size_bytes - HEAP_ALIGNMENT;
-	g_freeSize = g_pHeapStart->size;
+	g_pMemHead = (osal_mem_head_t *)addr;
+	g_pMemHead->mem.next = NULL;
+	g_pMemHead->mem.size = size_bytes - sizeof(osal_mem_head_t);
+	OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx\n", __func__, (size_t)(addr), (size_t)(g_pMemHead + 1));
 }
 //==================================================================================================
 //end files
