@@ -44,7 +44,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
     OSAL_ERR_T ret;
     if(events & OSAL_EVENT_MSG)
     {
-
+        
     }
 
     if(events & MAIN_EVENT_START)

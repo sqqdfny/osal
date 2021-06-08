@@ -57,6 +57,8 @@ typedef enum
 #define OSAL_BIT31    (0x80000000U)
 
 #define OSAL_EVENT_MSG     OSAL_BIT31
+
+
 //==================================================================================================
 typedef uint32_t osal_ucpu_t;   //与处理器位宽相同的类型
 typedef uint32_t osal_task_id_t;
@@ -65,6 +67,10 @@ typedef uint32_t osal_event_t;
 
 
 //==================================================================================================
+#define OsalEnterCritical()   OSAL_HAL_ENTER_CRITICAL()
+#define OsalExitCritical()    OSAL_HAL_EXIT_CRITICAL()
+
+
 #define OsalDebugInfo(fmt, args...) printf("osal info:" fmt, ##args)
 #define OsalDebugErr(fmt, args...)  printf("osal err:" fmt, ##args)
 //==================================================================================================

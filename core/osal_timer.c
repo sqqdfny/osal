@@ -7,7 +7,7 @@
 
 #include "osal_timer.h"
 #include "osal_config.h"
-#include "../hal/osal_hal_timer.h"
+#include "../hal/osal_hal.h"
 
 
 static osal_timer_t g_osal_timer_list[OSAL_TIMERS_MAX];
@@ -59,9 +59,11 @@ static void TimerFree(osal_timer_t * pTimer)
 
 OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param), void *param)
 {
+    OsalEnterCritical();
     osal_timer_t * pTimer = TimerAlloc();
     if(NULL == pTimer) 
     {
+        OsalExitCritical();
         *ppTimer = NULL;
         return OSAL_ERR_NO_TIMER;
     }
@@ -75,35 +77,44 @@ OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint3
         *ppTimer = pTimer;
     }
     AddTimerToUsedList(pTimer);
+    OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
 
 OSAL_ERR_T OsalDeleteTimer(osal_timer_t *pTimer)
 {
     if(NULL == pTimer) return OSAL_ERR_INVALID_HANDLE;
+    OsalEnterCritical();
     TimerFree(pTimer);
+    OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
 
 OSAL_ERR_T OsalTimerStart(osal_timer_t *pTimer)
 {
     if(NULL == pTimer) return OSAL_ERR_INVALID_HANDLE;
+    OsalEnterCritical();
     pTimer->is_running = true;
+    OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
 
 OSAL_ERR_T OsalTimerStop(osal_timer_t *pTimer)
 {
     if(NULL == pTimer) return OSAL_ERR_INVALID_HANDLE;
+    OsalEnterCritical();
     pTimer->is_running = false;
+    OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
 
 OSAL_ERR_T OsalTimerReset(osal_timer_t *pTimer, osal_timer_type_t type, uint32_t timeout)
 {
     if(NULL == pTimer) return OSAL_ERR_INVALID_HANDLE;
+    OsalEnterCritical();
     pTimer->timeout = timeout;
     pTimer->reload_timeout = (osal_timer_type_period == type) ? timeout : 0;
+    OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
 //==================================================================================================
@@ -112,6 +123,8 @@ void OsalUpdateTimers(void)
     osal_timer_t * pTimer, *pTimerNext;
     osal_system_tick_t tick = OsalHalGetCurSystemTick();
     uint32_t ms = tick - g_old_tick;
+
+    OsalEnterCritical();
     g_old_tick = tick;
     if(g_pUsedTimerList)
     {
@@ -127,7 +140,9 @@ void OsalUpdateTimers(void)
                 {
                     if(pTimer->callback)
                     {
+                        OsalExitCritical();
                         pTimer->callback(pTimer->param);
+                        OsalEnterCritical();
                     }
                     if(0 != pTimer->reload_timeout)
                     {//period
@@ -142,6 +157,7 @@ void OsalUpdateTimers(void)
             pTimer = pTimerNext;
         } while (NULL != pTimer);
     }
+    OsalExitCritical();
 }
 
 void OsalTimerInit(void)

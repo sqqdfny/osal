@@ -12,6 +12,14 @@ extern "C"
 #endif
 
 #define OSAL_MS_PER_TICK    10   //每个TICK有多少MS, 10ms的心跳
+
+
+/**
+ * @brief 临界状态的进入与退出
+ *        如果不在中断中调用OSAL的相关函数，可以为空定义
+ */
+#define OSAL_HAL_ENTER_CRITICAL()  
+#define OSAL_HAL_EXIT_CRITICAL()   
 //==================================================================================================
 /**
  * @brief 获取当前的tick值

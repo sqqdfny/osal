@@ -1,6 +1,7 @@
 /**
- * @file osal_hal_timer.c
- * @brief 硬件定时器实现，为osal操作系统提供系统滴答心跳时钟，移植时需要修改该文件
+ * @file osal_hal.c
+ * @brief 硬件操作层的实现，包括定时器和中断控制相关，移植时需要修改该文件
+ *        本实例为LINUX下的实现
  * @date 2021-06-08
  * @author sqqdfny
  */
@@ -12,7 +13,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include "osal_hal_timer.h"
+#include "osal_hal.h"
 
 static osal_system_tick_t g_system_tick;
 //==================================================================================================
