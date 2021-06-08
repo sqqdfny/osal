@@ -25,7 +25,7 @@ C_FLAGS += -I$(DirRoot)
 TARGET = main
 
 $(TARGET):$(OBJS)
-	$(C_CC) $(C_FLAGS) -o $@ $^
+	$(C_CC) $(C_FLAGS) -o $@ $^ -lpthread
 
 $(DirObjRoot)%.o:$(DirRoot)%.c
 	@test -d $(@D) || mkdir -p $(@D)
