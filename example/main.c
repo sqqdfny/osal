@@ -17,6 +17,14 @@
 static osal_task_id_t g_main_task_id;
 static osal_timer_t *pTimer0, *pTimer1;
 static uint32_t timer_cnt[4];
+static uint32_t g_main_task_index = 0;
+
+typedef struct 
+{
+    uint32_t timer;
+    uint32_t index;
+    uint8_t buf[37];
+}main_task_msg_t;
 
 typedef struct 
 {
@@ -28,6 +36,20 @@ static void Timer0_cb(void * param)
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
     OsalEventSet(p->task_id, MAIN_EVENT_TIMER0);
+    main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
+    if(pmsg)
+    {
+        pmsg->timer = 0;
+        pmsg->index = g_main_task_index ++;
+        if(OSAL_ERR_SUCC != OsalMsgQueuePost(p->task_id, pmsg))
+        {
+            AppDebugPrintf("%s timer0 send msg failed\n", __func__);
+        }
+    }
+    else
+    {
+        AppDebugPrintf("%s timer0 msg alloc failed\n", __func__);
+    }
 }
 
 static void Timer1_cb(void * param)
@@ -35,6 +57,21 @@ static void Timer1_cb(void * param)
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
     OsalEventSet(p->task_id, MAIN_EVENT_TIMER1);
+    main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
+    AppDebugPrintf("%s: msg alloc=%08x\n", __func__, (uint32_t)pmsg);
+    if(pmsg)
+    {
+        pmsg->timer = 1;
+        pmsg->index = g_main_task_index ++;
+        if(OSAL_ERR_SUCC != OsalMsgQueuePost(p->task_id, pmsg))
+        {
+            AppDebugPrintf("%s timer1 send msg failed\n", __func__);
+        }
+    }
+    else
+    {
+        AppDebugPrintf("%s timer1 msg alloc failed\n", __func__);
+    }
 }
 
 static void Timer2_cb(void * param)
@@ -42,6 +79,21 @@ static void Timer2_cb(void * param)
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
     OsalEventSet(p->task_id, MAIN_EVENT_TIMER2);
+    
+    main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
+    if(pmsg)
+    {
+        pmsg->timer = 2;
+        pmsg->index = g_main_task_index ++;
+        if(OSAL_ERR_SUCC != OsalMsgQueuePost(p->task_id, pmsg))
+        {
+            AppDebugPrintf("%s timer2 send msg failed\n", __func__);
+        }
+    }
+    else
+    {
+        AppDebugPrintf("%s timer2 msg alloc failed\n", __func__);
+    }
     OsalMemFree(param);
 }
 
@@ -50,6 +102,21 @@ static void Timer3_cb(void * param)
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
     OsalEventSet(p->task_id, MAIN_EVENT_TIMER3);
+    
+    main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
+    if(pmsg)
+    {
+        pmsg->timer = 3;
+        pmsg->index = g_main_task_index ++;
+        if(OSAL_ERR_SUCC != OsalMsgQueuePost(p->task_id, pmsg))
+        {
+            AppDebugPrintf("%s timer3 send msg failed\n", __func__);
+        }
+    }
+    else
+    {
+        AppDebugPrintf("%s timer3 msg alloc failed\n", __func__);
+    }
     OsalMemFree(param);
 }
 
@@ -57,9 +124,15 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
 {
     OSAL_ERR_T ret;
     timer_cb_param_t *p;
+    main_task_msg_t *pmsg;
     if(events & OSAL_EVENT_MSG)
     {
-        
+        pmsg = OsalMsgQueuePend(task_id);
+        if(pmsg)
+        {
+            AppDebugPrintf("%s:msg timer=%u index=%u\n", __func__, pmsg->timer, pmsg->index);
+            OsalMsgQueueFree(pmsg);
+        }
     }
 
     if(events & MAIN_EVENT_START)
@@ -155,7 +228,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
                 AppDebugPrintf("%s MAIN_EVENT_TIMER1 OsalDeleteTimer err=%d\n", __func__, ret);
             }
 
-            AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(100)));
+            AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(1024)));
         }
     }
 

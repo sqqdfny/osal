@@ -9,8 +9,24 @@
 extern "C"
 {
 #endif
+
 //==================================================================================================
-void * OsalMemAlloc(uint32_t size_req);
+#define HEAP_ALIGNMENT				16
+#define HEAP_ALIGNMENT_SIZE         ((sizeof(osal_mem_t) < HEAP_ALIGNMENT) ? HEAP_ALIGNMENT : ((sizeof(osal_mem_t) + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1)))
+
+typedef struct OSAL_MEM_T
+{
+	struct OSAL_MEM_T *next;
+	size_t size;
+}osal_mem_t;
+
+typedef union
+{
+	osal_mem_t mem;
+	uint8_t reserved[HEAP_ALIGNMENT_SIZE];
+}osal_mem_head_t;
+//==================================================================================================
+void * OsalMemAlloc(size_t size_req);
 void OsalMemFree(void* p);
 
 /**

@@ -7,30 +7,18 @@
 
 #include "osal_typedef.h"
 #include "osal_config.h"
+#include "osal_mem.h"
 #include "../hal/osal_hal.h"
 
 
 #define OSAL_MEM_DEBUG_EN 
-#undef OSAL_MEM_DEBUG_EN
+//#undef OSAL_MEM_DEBUG_EN
 //===================================================================
 
 #define OsalMemEnterCritical()		OsalEnterCritical()		
 #define OsalMemExitCritical()		OsalExitCritical()		
 				
-#define HEAP_ALIGNMENT				16
-#define HEAP_ALIGNMENT_SIZE         ((sizeof(osal_mem_t) < HEAP_ALIGNMENT) ? HEAP_ALIGNMENT : ((sizeof(osal_mem_t) + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1)))
 
-typedef struct OSAL_MEM_T
-{
-	struct OSAL_MEM_T *next;
-	size_t size;
-}osal_mem_t;
-
-typedef union
-{
-	osal_mem_t mem;
-	uint8_t reserved[HEAP_ALIGNMENT_SIZE];
-}osal_mem_head_t;
 
 
 static osal_mem_head_t *g_pMemHead;
@@ -189,6 +177,17 @@ void * OsalMemAlloc(size_t size_req)
 		OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx 0x%04lx\n", __func__, (size_t)(p), (size_t)(g_pMemHead), size_req);
 		return (p + 1);
 	}
+	else
+	{
+	#if (0)
+		if(NULL == g_pMemHead->mem.next)
+		{
+			OsalMemExitCritical();
+			OsalMemDebugPrintf("%s: no mem\n", __func__);
+			return NULL;
+		}
+	#endif 
+	}
 
 
 	prev = g_pMemHead;
@@ -216,11 +215,13 @@ void * OsalMemAlloc(size_t size_req)
 		}
 		else
 		{
+			OsalMemDebugPrintf("%s: next 0x%08lx 0x%08lx\n", __func__, (size_t)(prev), (size_t)(p));
 			prev = p;
 			p = (osal_mem_head_t*)(prev->mem.next);
 		}
 	}while(NULL != p);
 	OsalMemExitCritical();
+	OsalMemDebugPrintf("%s: no mem 1\n", __func__);
 	return NULL;
 }
 
@@ -235,13 +236,13 @@ void OsalMemFree(void* pMem)
 	if(p < g_pMemHead)
 	{
 		p->mem.next = (osal_mem_t*)g_pMemHead;
-		g_pMemHead = p;
-		if((g_pMemHead->mem.size + sizeof(osal_mem_head_t)) == (((uint8_t*)(g_pMemHead->mem.next)) - ((uint8_t*)g_pMemHead)))
+		if((p->mem.size + sizeof(osal_mem_head_t)) == (((uint8_t*)(p->mem.next)) - ((uint8_t*)p)))
 		{
-			OsalMemDebugPrintf("%s: merge head 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(g_pMemHead), g_pMemHead->mem.size, (size_t)(p));
-			g_pMemHead->mem.next = g_pMemHead->mem.next->next;
-			g_pMemHead->mem.size = g_pMemHead->mem.size + sizeof(osal_mem_head_t);
+			OsalMemDebugPrintf("%s: merge head 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(g_pMemHead));
+			p->mem.next = g_pMemHead->mem.next;
+			p->mem.size += g_pMemHead->mem.size + sizeof(osal_mem_head_t);
 		}
+		g_pMemHead = p;
 		OsalMemExitCritical();
 		return;
 	}

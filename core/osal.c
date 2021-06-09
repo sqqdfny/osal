@@ -9,16 +9,20 @@
 #include "osal_config.h"
 #include "osal_timer.h"
 #include "osal_mem.h"
+#include "osal_msg_queue.h"
 #include "../hal/osal_hal.h"
 
-typedef struct 
+osal_tcb_t g_osal_tcb_list[OSAL_TASK_TOTAL];
+osal_task_id_t g_cur_task_total;
+//==================================================================================================
+void * OsalGetTaskQueueHandle(osal_task_id_t task_id)
 {
-    osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events);
-    osal_event_t events;
-}osal_tcb_t;
-
-static osal_tcb_t g_osal_tcb_list[OSAL_TASK_TOTAL];
-static osal_task_id_t g_cur_task_total;
+    if(task_id >= g_cur_task_total)
+    {
+        return NULL;
+    }
+    return &(g_osal_tcb_list[task_id].queue);
+}
 //==================================================================================================
 OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events)
 {
@@ -56,6 +60,7 @@ OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_ta
     OsalEnterCritical();
     g_osal_tcb_list[g_cur_task_total].events = 0;
     g_osal_tcb_list[g_cur_task_total].pProcess = pProcess;
+    OsalMsgQueueinit(g_cur_task_total);
     if(pTaskId)
     {
         *pTaskId = g_cur_task_total;
@@ -75,6 +80,10 @@ void OsalStartSystem(void)
         do
         {
             OsalEnterCritical();
+            if(NULL != g_osal_tcb_list[i].queue)
+            {
+                g_osal_tcb_list[i].events |= OSAL_EVENT_MSG;
+            }
             events = g_osal_tcb_list[i].events;
             g_osal_tcb_list[i].events = 0;
             OsalExitCritical();

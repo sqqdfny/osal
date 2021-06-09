@@ -7,14 +7,23 @@
 #include "osal_typedef.h"
 #include "osal_timer.h"
 #include "osal_mem.h"
+#include "osal_msg_queue.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 //==================================================================================================
-
+typedef struct 
+{
+    osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events);
+    void *queue;
+    osal_event_t events;
+}osal_tcb_t;
+//==================================================================================================
 typedef uint32_t (*OsalTaskFun_p)(osal_task_id_t task_id);
+
+void * OsalGetTaskQueueHandle(osal_task_id_t task_id);
 
 OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events);
 OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events);
