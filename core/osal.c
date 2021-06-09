@@ -15,15 +15,6 @@
 osal_tcb_t g_osal_tcb_list[OSAL_TASK_TOTAL];
 osal_task_id_t g_cur_task_total;
 //==================================================================================================
-void * OsalGetTaskQueueHandle(osal_task_id_t task_id)
-{
-    if(task_id >= g_cur_task_total)
-    {
-        return NULL;
-    }
-    return &(g_osal_tcb_list[task_id].queue);
-}
-//==================================================================================================
 OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events)
 {
     if(task_id >= g_cur_task_total)
@@ -95,7 +86,7 @@ void OsalStartSystem(void)
                     events = g_osal_tcb_list[i].pProcess(i, events);
 
                     OsalEnterCritical();
-                    g_osal_tcb_list[i].events = events;
+                    g_osal_tcb_list[i].events |= events;
                     OsalExitCritical();
                 }
                 else 
@@ -125,6 +116,7 @@ void OsalInitSystem(uint32_t * addr, size_t size_bytes)
     for(i = 0; i < OSAL_TASK_TOTAL; i ++)
     {
         g_osal_tcb_list[i].pProcess = NULL;
+        g_osal_tcb_list[i].queue = NULL;
         g_osal_tcb_list[i].events = 0;
     }
 

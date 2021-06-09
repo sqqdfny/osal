@@ -53,8 +53,8 @@ OSAL_ERR_T OsalMsgQueuePost(osal_task_id_t task_id, void *pMsg)
     if(NULL == g_osal_tcb_list[task_id].queue)
     {
         g_osal_tcb_list[task_id].queue = pmsg;
+        g_osal_tcb_list[task_id].events |= OSAL_EVENT_MSG;
         OsalExitCritical();
-        OsalEventSet(task_id, OSAL_EVENT_MSG);
         return OSAL_ERR_SUCC;
     }
 
@@ -66,8 +66,8 @@ OSAL_ERR_T OsalMsgQueuePost(osal_task_id_t task_id, void *pMsg)
         }while(pqueue->mem.next);
     }
     pqueue->mem.next = (void*)pmsg;
+    g_osal_tcb_list[task_id].events |= OSAL_EVENT_MSG;
     OsalExitCritical();
-    OsalEventSet(task_id, OSAL_EVENT_MSG);
     return OSAL_ERR_SUCC;
 }
 
@@ -88,9 +88,10 @@ void* OsalMsgQueuePend(osal_task_id_t task_id)
 
 void OsalMsgQueueinit(osal_task_id_t task_id)
 {
-    if(task_id >= g_cur_task_total) return;
-
+#if (0)
+    if(task_id >= OSAL_TASK_TOTAL) return;
     g_osal_tcb_list[task_id].queue = NULL;
+#endif
 }
 //==================================================================================================
 //end files

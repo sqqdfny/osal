@@ -13,16 +13,13 @@
 
 #define OSAL_MEM_DEBUG_EN 
 #undef OSAL_MEM_DEBUG_EN
-//===================================================================
+
 
 #define OsalMemEnterCritical()		OsalEnterCritical()		
 #define OsalMemExitCritical()		OsalExitCritical()		
 				
 
-
-
 static osal_mem_head_t *g_pMemHead;
-
 //==================================================================================================
 #ifdef OSAL_MEM_DEBUG_EN
 	#define OsalMemDebugPrintf(fmt, args...)  OsalDebugInfo(fmt, ##args)
