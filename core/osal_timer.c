@@ -132,7 +132,7 @@ void OsalUpdateTimers(void)
 
     OsalEnterCritical();
     g_old_tick = tick;
-    if(g_pUsedTimerList)
+    if((NULL != g_pUsedTimerList) && (ms > 0))
     {
         ms = ms * OSAL_MS_PER_TICK;
         pTimer = g_pUsedTimerList;

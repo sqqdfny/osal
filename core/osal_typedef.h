@@ -63,7 +63,6 @@ typedef enum
 	#define NULL 	0
 #endif
 //==================================================================================================
-typedef uint32_t osal_ucpu_t;   //与处理器位宽相同的类型
 typedef uint32_t osal_task_id_t;
 typedef uint32_t osal_system_tick_t;
 typedef uint32_t osal_event_t;

@@ -14,8 +14,8 @@
 #undef OSAL_MEM_DEBUG_EN
 //===================================================================
 
-#define OsalMemEnterCritical()			  OsalEnterCritical()		
-#define OsalMemExitCritical()			  OsalExitCritical()		
+#define OsalMemEnterCritical()		OsalEnterCritical()		
+#define OsalMemExitCritical()		OsalExitCritical()		
 				
 #define HEAP_ALIGNMENT				16
 #define HEAP_ALIGNMENT_SIZE         ((sizeof(osal_mem_t) < HEAP_ALIGNMENT) ? HEAP_ALIGNMENT : ((sizeof(osal_mem_t) + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1)))

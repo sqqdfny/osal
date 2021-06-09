@@ -10,8 +10,6 @@ extern "C"
 {
 #endif
 //==================================================================================================
-
-uint32_t OsalGetFreeHeapSize(void);
 void * OsalMemAlloc(uint32_t size_req);
 void OsalMemFree(void* p);
 
