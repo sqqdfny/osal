@@ -51,7 +51,7 @@ void * OsalMemAlloc(size_t size_req)
 			return (p + 1);
 		}
 		else
-		if(p->mem.size >= (size_req + sizeof(osal_mem_head_t)))
+		if(p->mem.size >= (size_req))
 		{
 			prev->mem.next = p->mem.next;
 			if(p == g_pMemHead)
@@ -84,9 +84,14 @@ void OsalMemFree(void* pMem)
 	OsalMemEnterCritical();
 	if(p < g_pMemHead)
 	{
-		p->mem.next = g_pMemHead->mem.next;
-		p->mem.size += g_pMemHead->mem.size + sizeof(osal_mem_head_t);
+		p->mem.next = (osal_mem_t*)g_pMemHead;
 		g_pMemHead = p;
+		if(g_pMemHead->mem.size == (((uint8_t*)(g_pMemHead->mem.next)) - ((uint8_t*)g_pMemHead)))
+		{
+			OsalMemDebugPrintf("%s: merge head 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(g_pMemHead), g_pMemHead->mem.size, (size_t)(p));
+			g_pMemHead->mem.next = g_pMemHead->mem.next->next;
+			g_pMemHead->mem.size = g_pMemHead->mem.size + sizeof(osal_mem_head_t);
+		}
 		OsalMemExitCritical();
 		return;
 	}
