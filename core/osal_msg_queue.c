@@ -16,7 +16,7 @@
 
 
 #define OSAL_MSG_DEBUG_EN 
-//#undef OSAL_MSG_DEBUG_EN
+#undef OSAL_MSG_DEBUG_EN
 
 #ifdef OSAL_MSG_DEBUG_EN
 	#define OsalMemDebugPrintf(fmt, args...)  OsalDebugInfo(fmt, ##args)

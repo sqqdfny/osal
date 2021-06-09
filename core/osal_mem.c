@@ -12,7 +12,7 @@
 
 
 #define OSAL_MEM_DEBUG_EN 
-//#undef OSAL_MEM_DEBUG_EN
+#undef OSAL_MEM_DEBUG_EN
 //===================================================================
 
 #define OsalMemEnterCritical()		OsalEnterCritical()		

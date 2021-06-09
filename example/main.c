@@ -228,7 +228,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
                 AppDebugPrintf("%s MAIN_EVENT_TIMER1 OsalDeleteTimer err=%d\n", __func__, ret);
             }
 
-            AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(1024)));
+            AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(100)));
         }
     }
 
