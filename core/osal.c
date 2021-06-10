@@ -13,50 +13,48 @@
 #include "../hal/osal_hal.h"
 
 osal_tcb_t g_osal_tcb_list[OSAL_TASK_NUM];
-osal_task_id_t g_cur_task_total;
+osal_task_id_t g_osal_cur_task_total;
 //==================================================================================================
-OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events)
+void OsalEventSet(osal_task_id_t task_id, osal_event_t events)
 {
-    if(task_id >= g_cur_task_total)
+    if(task_id >= g_osal_cur_task_total)
     {
-        return OSAL_ERR_INVALID_HANDLE;
+        return;
     }
 
     OsalEnterCritical();
     g_osal_tcb_list[task_id].events |= events;
     OsalExitCritical();
-    return OSAL_ERR_SUCC;
 }
 
-OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events)
+void OsalEventClear(osal_task_id_t task_id, osal_event_t events)
 {
-    if(task_id >= g_cur_task_total)
+    if(task_id >= g_osal_cur_task_total)
     {
-        return OSAL_ERR_INVALID_HANDLE;
+        return;
     }
 
     OsalEnterCritical();
     g_osal_tcb_list[task_id].events &= ~events;
     OsalExitCritical();
-    return OSAL_ERR_SUCC;
 }
 //==================================================================================================
 OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events))
 {
-    if(g_cur_task_total >= OSAL_TASK_NUM) 
+    if(g_osal_cur_task_total >= OSAL_TASK_NUM) 
     {
         return OSAL_ERR_NO_TASK;
     }
 
     OsalEnterCritical();
-    g_osal_tcb_list[g_cur_task_total].events = 0;
-    g_osal_tcb_list[g_cur_task_total].pProcess = pProcess;
-    OsalMsgQueueinit(g_cur_task_total);
+    g_osal_tcb_list[g_osal_cur_task_total].events = 0;
+    g_osal_tcb_list[g_osal_cur_task_total].pProcess = pProcess;
+    OsalMsgQueueinit(g_osal_cur_task_total);
     if(pTaskId)
     {
-        *pTaskId = g_cur_task_total;
+        *pTaskId = g_osal_cur_task_total;
     }
-    g_cur_task_total ++;
+    g_osal_cur_task_total ++;
     OsalExitCritical();
     return OSAL_ERR_SUCC;
 }
@@ -87,6 +85,7 @@ void OsalStartSystem(void)
 
                     OsalEnterCritical();
                     g_osal_tcb_list[i].events |= events;
+                    events = g_osal_tcb_list[i].events;
                     OsalExitCritical();
                 }
                 else 
@@ -96,7 +95,7 @@ void OsalStartSystem(void)
                 if(events) continue;
             }
             i ++;
-        }while(i < g_cur_task_total);
+        }while(i < g_osal_cur_task_total);
 
         OsalHalt();
     }while(1);
@@ -112,7 +111,7 @@ void OsalInitSystem(uint32_t * addr, size_t size_bytes)
 {
     int i;
     OsalEnterCritical();
-    g_cur_task_total = 0;
+    g_osal_cur_task_total = 0;
     for(i = 0; i < OSAL_TASK_NUM; i ++)
     {
         g_osal_tcb_list[i].pProcess = NULL;

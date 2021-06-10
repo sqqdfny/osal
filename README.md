@@ -52,7 +52,6 @@
 
 //==================================================================================================
 以下为对外提供的接口清单
-
 1.内存分配与回收,回收内存时,会合并相邻的内存块
   void * OsalMemAlloc(size_t size_req);
   void OsalMemFree(void* p);
@@ -88,8 +87,8 @@
   
 
 4.事件管理
-  OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events);
-  OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events);
+  void OsalEventSet(osal_task_id_t task_id, osal_event_t events);
+  void OsalEventClear(osal_task_id_t task_id, osal_event_t events);
  
 
 5.任务管理
@@ -102,10 +101,10 @@
   启动系统,此函数不会返回
   void OsalStartSystem(void);
 
+
 7.初始化系统
   addr:用于内存管理的内存基址
   size_bytes:内存块的大小,单位为字节
   如果不使用 msg_queue, 同时用户也不调用内存管理相关的函数, 可以传入NULL
   void OsalInitSystem(uint32_t * addr, size_t size_bytes);
- 
 //==================================================================================================

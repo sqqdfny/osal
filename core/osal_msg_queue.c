@@ -27,7 +27,7 @@
 typedef osal_mem_head_t osal_msg_t;
 
 extern osal_tcb_t g_osal_tcb_list[OSAL_TASK_NUM];
-extern osal_task_id_t g_cur_task_total;
+extern osal_task_id_t g_osal_cur_task_total;
 //==================================================================================================
 void * OsalMsgQueueAlloc(size_t size)
 {
@@ -44,7 +44,7 @@ OSAL_ERR_T OsalMsgQueuePost(osal_task_id_t task_id, void *pMsg)
 {
     osal_msg_t *pqueue;
     osal_msg_t *pmsg = (osal_msg_t*)pMsg;
-    if(task_id >= g_cur_task_total || NULL == pMsg) return OSAL_ERR_INVALID_HANDLE;
+    if(task_id >= g_osal_cur_task_total || NULL == pMsg) return OSAL_ERR_INVALID_HANDLE;
 
     OsalEnterCritical();
     pmsg --;
@@ -74,7 +74,7 @@ OSAL_ERR_T OsalMsgQueuePost(osal_task_id_t task_id, void *pMsg)
 void* OsalMsgQueuePend(osal_task_id_t task_id)
 {
     osal_msg_t *pmsg;
-    if(task_id >= g_cur_task_total || NULL == g_osal_tcb_list[task_id].queue) return NULL;
+    if(task_id >= g_osal_cur_task_total || NULL == g_osal_tcb_list[task_id].queue) return NULL;
 
     OsalEnterCritical();
     pmsg = g_osal_tcb_list[task_id].queue;
