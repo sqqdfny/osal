@@ -4,11 +4,11 @@
  * @date 2021-06-08
  * @author sqqdfny
  */
-#define OSAL_TASK_TOTAL     2    //系统最大支持的任务个数,最小值为1
+#define OSAL_TASK_NUM       2    //系统最大支持的任务个数,最小值为1
 
-#define OSAL_TIMERS_MAX     8    //系统最大支持的定时器个数,最小值为2
-#if (OSAL_TIMERS_MAX < 2)
-    #error "OSAL_TIMERS_MAX must equal or more than 2!!!"
+#define OSAL_TIMERS_NUM     8    //系统最大支持的定时器个数,最小值为2
+#if (OSAL_TIMERS_NUM < 2)
+    #error "OSAL_TIMERS_NUM must equal or more than 2!!!"
 #endif
 
 

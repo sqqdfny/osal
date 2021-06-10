@@ -12,7 +12,7 @@
 #include "osal_msg_queue.h"
 #include "../hal/osal_hal.h"
 
-osal_tcb_t g_osal_tcb_list[OSAL_TASK_TOTAL];
+osal_tcb_t g_osal_tcb_list[OSAL_TASK_NUM];
 osal_task_id_t g_cur_task_total;
 //==================================================================================================
 OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events)
@@ -43,7 +43,7 @@ OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events)
 //==================================================================================================
 OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events))
 {
-    if(g_cur_task_total >= OSAL_TASK_TOTAL) 
+    if(g_cur_task_total >= OSAL_TASK_NUM) 
     {
         return OSAL_ERR_NO_TASK;
     }
@@ -113,7 +113,7 @@ void OsalInitSystem(uint32_t * addr, size_t size_bytes)
     int i;
     OsalEnterCritical();
     g_cur_task_total = 0;
-    for(i = 0; i < OSAL_TASK_TOTAL; i ++)
+    for(i = 0; i < OSAL_TASK_NUM; i ++)
     {
         g_osal_tcb_list[i].pProcess = NULL;
         g_osal_tcb_list[i].queue = NULL;

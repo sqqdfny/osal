@@ -122,7 +122,6 @@ static void Timer3_cb(void * param)
 
 static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
 {
-    OSAL_ERR_T ret;
     timer_cb_param_t *p;
     main_task_msg_t *pmsg;
     if(events & OSAL_EVENT_MSG)
@@ -147,51 +146,97 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
         //OsalMemAlloc(sizeof(timer_cb_param_t));
         #if (1)
         p = OsalMemAlloc(sizeof(timer_cb_param_t));
-        if(NULL == p)
+        if(NULL != p)
+        {
+            p->task_id = task_id;
+            pTimer0 = OsalCreateTimer(osal_timer_type_period, 1000, Timer0_cb);
+            if(pTimer0)
+            {
+                if(!OsalTimerStart(pTimer0, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START0 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START0 OsalCreateTimer\n", __func__);
+            }
+        }
+        else
         {
             AppDebugPrintf("%s timer0_0 mem failed\n", __func__);
         }
-        p->task_id = task_id;
-        ret = OsalCreateTimer(&pTimer0, osal_timer_type_period, 1000, Timer0_cb, (void*)p);
-        if(OSAL_ERR_SUCC != ret)
+        
+
+        p = OsalMemAlloc(sizeof(timer_cb_param_t));
+        if(NULL != p)
         {
-            AppDebugPrintf("%s MAIN_EVENT_START0 OsalCreateTimer err=%d\n", __func__, ret);
+            p->task_id = task_id;
+            pTimer1 = OsalCreateTimer(osal_timer_type_period, 2000, Timer1_cb);
+            if(pTimer1)
+            {
+                if(!OsalTimerStart(pTimer1, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START1 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START1 OsalCreateTimer\n", __func__);
+            }
+        }
+        else
+        {
+            AppDebugPrintf("%s timer0_0 mem failed\n", __func__);
         }
 
         p = OsalMemAlloc(sizeof(timer_cb_param_t));
-        if(NULL == p)
+        if(NULL != p)
         {
-            AppDebugPrintf("%s timer1_0 mem failed\n", __func__);
+            p->task_id = task_id;
+            osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 1000, Timer2_cb);
+            if(ptimer)
+            {
+                if(!OsalTimerStart(ptimer, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START2 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START2 OsalCreateTimer\n", __func__);
+            }
         }
-        p->task_id = task_id;
-        ret = OsalCreateTimer(&pTimer1, osal_timer_type_period, 2000, Timer1_cb, (void*)p);
-        if(OSAL_ERR_SUCC != ret)
-        {
-            AppDebugPrintf("%s MAIN_EVENT_START1 OsalCreateTimer err=%d\n", __func__, ret);
-        }
-
-        p = OsalMemAlloc(sizeof(timer_cb_param_t));
-        if(NULL == p)
+        else
         {
             AppDebugPrintf("%s timer2_0 mem failed\n", __func__);
         }
-        p->task_id = task_id;
-        ret = OsalCreateTimer(NULL, osal_timer_type_one_shot, 1000, Timer2_cb, (void*)p);
-        if(OSAL_ERR_SUCC != ret)
-        {
-            AppDebugPrintf("%s MAIN_EVENT_START2 OsalCreateTimer err=%d\n", __func__, ret);
-        }
+        
 
         p = OsalMemAlloc(sizeof(timer_cb_param_t));
-        if(NULL == p)
+        if(NULL != p)
+        {
+            p->task_id = task_id;
+            osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 2000, Timer3_cb);
+            if(ptimer)
+            {
+                if(!OsalTimerStart(ptimer, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START3 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START3 OsalCreateTimer\n", __func__);
+            }
+        }
+        else
         {
             AppDebugPrintf("%s timer3_0 mem failed\n", __func__);
-        }
-        p->task_id = task_id;
-        ret = OsalCreateTimer(NULL, osal_timer_type_one_shot, 2000, Timer3_cb, (void*)p);
-        if(OSAL_ERR_SUCC != ret)
-        {
-            AppDebugPrintf("%s MAIN_EVENT_START3 OsalCreateTimer err=%d\n", __func__, ret);
         }
         #endif 
     }
@@ -203,13 +248,9 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
         if(timer_cnt[0] >= 5)
         {
             AppDebugPrintf("%s MAIN_EVENT_TIMER0: %u end\n", __func__, timer_cnt[1]);
-            OsalTimerStop(pTimer0);
-            OsalMemFree(OsalTimerGetParam(pTimer0));
-            ret = OsalDeleteTimer(pTimer0);
-            if(OSAL_ERR_SUCC != ret)
-            {
-                AppDebugPrintf("%s MAIN_EVENT_TIMER0 OsalDeleteTimer err=%d\n", __func__, ret);
-            }
+            ;
+            OsalMemFree(OsalTimerStop(pTimer0));
+            OsalDeleteTimer(pTimer0);
         }
     }
 
@@ -220,14 +261,9 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
         if(timer_cnt[1] >= 5)
         {
             AppDebugPrintf("%s MAIN_EVENT_TIMER1: %u end\n", __func__, timer_cnt[1]);
-            OsalTimerStop(pTimer1);
-            OsalMemFree(OsalTimerGetParam(pTimer1));
-            ret = OsalDeleteTimer(pTimer1);
-            if(OSAL_ERR_SUCC != ret)
-            {
-                AppDebugPrintf("%s MAIN_EVENT_TIMER1 OsalDeleteTimer err=%d\n", __func__, ret);
-            }
-
+            OsalMemFree(OsalTimerStop(pTimer1));
+            OsalDeleteTimer(pTimer1);
+            
             AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(100)));
         }
     }
@@ -244,10 +280,18 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             }
             p->task_id = task_id;
             AppDebugPrintf("%s MAIN_EVENT_TIMER2: %u\n", __func__, timer_cnt[2]);
-            ret = OsalCreateTimer(NULL, osal_timer_type_one_shot, 1000, Timer2_cb, (void*)p);
-            if(OSAL_ERR_SUCC != ret)
+            osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 1000, Timer2_cb);
+            if(ptimer)
             {
-                AppDebugPrintf("%s MAIN_EVENT_TIMER2 OsalCreateTimer err=%d\n", __func__, ret);
+                if(!OsalTimerStart(ptimer, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START2 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START2 OsalCreateTimer\n", __func__);
             }
         }
         else
@@ -268,10 +312,18 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             }
             p->task_id = task_id;
             AppDebugPrintf("%s MAIN_EVENT_TIMER3: %u\n", __func__, timer_cnt[3]);
-            ret = OsalCreateTimer(NULL, osal_timer_type_one_shot, 2000, Timer3_cb, (void*)p);
-            if(OSAL_ERR_SUCC != ret)
+            osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 2000, Timer3_cb);
+            if(ptimer)
             {
-                AppDebugPrintf("%s MAIN_EVENT_TIMER3 OsalCreateTimer err=%d\n", __func__, ret);
+                if(!OsalTimerStart(ptimer, (void*)p))
+                {
+                    OsalMemFree((void*)p);
+                    AppDebugPrintf("%s MAIN_EVENT_START3 OsalTimerStart Failed\n", __func__);
+                }
+            }
+            else
+            {
+                AppDebugPrintf("%s MAIN_EVENT_START3 OsalCreateTimer\n", __func__);
             }
         }
         else

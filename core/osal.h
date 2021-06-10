@@ -39,33 +39,6 @@ void OsalStartSystem(void);
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes);
 //==================================================================================================
-
-
-//==================================================================================================
-/**
- * 以下为对外提供的接口清单
- * void * OsalMemAlloc(size_t size_req);
- * void OsalMemFree(void* p);
- * 
- * void * OsalMsgQueueAlloc(size_t size);
- * void OsalMsgQueueFree(void *p);
- * OSAL_ERR_T OsalMsgQueuePost(osal_task_id_t task_id, void *pMsg);
- * void* OsalMsgQueuePend(osal_task_id_t task_id);
- * 
- * OSAL_ERR_T OsalCreateTimer(osal_timer_t **ppTimer, osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param), void *param);
- * void * OsalTimerGetParam(osal_timer_t *pTimer);
- * OSAL_ERR_T OsalDeleteTimer(osal_timer_t *pTimer);
- * OSAL_ERR_T OsalTimerStart(osal_timer_t *pTimer);
- * OSAL_ERR_T OsalTimerStop(osal_timer_t *pTimer);
- * OSAL_ERR_T OsalTimerReset(osal_timer_t *pTimer, osal_timer_type_t type, uint32_t timeout);
- * 
- * OSAL_ERR_T OsalEventSet(osal_task_id_t task_id, osal_event_t events);
- * OSAL_ERR_T OsalEventClear(osal_task_id_t task_id, osal_event_t events);
- * OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events));
- * void OsalStartSystem(void);
- * void OsalInitSystem(uint32_t * addr, size_t size_bytes);
- */
-//==================================================================================================
 #ifdef __cplusplus
 }
 #endif

@@ -26,7 +26,7 @@
 
 typedef osal_mem_head_t osal_msg_t;
 
-extern osal_tcb_t g_osal_tcb_list[OSAL_TASK_TOTAL];
+extern osal_tcb_t g_osal_tcb_list[OSAL_TASK_NUM];
 extern osal_task_id_t g_cur_task_total;
 //==================================================================================================
 void * OsalMsgQueueAlloc(size_t size)
@@ -89,7 +89,7 @@ void* OsalMsgQueuePend(osal_task_id_t task_id)
 void OsalMsgQueueinit(osal_task_id_t task_id)
 {
 #if (0)
-    if(task_id >= OSAL_TASK_TOTAL) return;
+    if(task_id >= OSAL_TASK_NUM) return;
     g_osal_tcb_list[task_id].queue = NULL;
 #endif
 }

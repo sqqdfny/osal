@@ -66,7 +66,7 @@ void OsalHalTimerTickInit(void)
 }
 
 /**
- * @brief 开启硬件定时器，OSAL会根据程序中软件定时器的实际使用动态开启和关闭，为空则一直开启
+ * @brief 开启硬件定时器，为空则一直开启
  */
 void OsalHalTimerTickStart(void)
 {
