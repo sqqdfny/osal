@@ -10,9 +10,6 @@
   typedef uint32_t osal_system_tick_t;
   typedef uint32_t osal_event_t;
 
-  进入和退出临界状态,如果应用不在中断中调用OSAL的相关接口,这两个宏可以为空
-  #define OsalEnterCritical()   OSAL_HAL_ENTER_CRITICAL()
-  #define OsalExitCritical()    OSAL_HAL_EXIT_CRITICAL()
 
   调试打印信息宏,实际应用中这两个宏建议为空
   #define OsalDebugInfo(fmt, args...) printf("osal info:" fmt, ##args)
@@ -28,13 +25,18 @@
 
 
 3.core/osal_mem.h
-  内存管理的对齐设置,实际的对齐字节有可能比设置的大
-  #define HEAP_ALIGNMENT				16
+  内存管理的对齐设置
+  #define HEAP_ALIGNMENT_SIZE				4
 
 
 4.hal/osal_hal.h
   定义每个系统TICK有多少MS,建议为1或者10
-  #define OSAL_MS_PER_TICK    10   
+  #define OSAL_MS_PER_TICK    10  
+
+  进入和退出临界状态,如果应用不在中断中调用OSAL的相关接口,这两个宏可以为空
+  #define OSAL_HAL_ENTER_CRITICAL()  
+  #define OSAL_HAL_EXIT_CRITICAL() 
+
 
 4.hal/osal_hal.c
   硬件相关的一些接口实现

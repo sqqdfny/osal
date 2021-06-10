@@ -35,7 +35,6 @@ static void Timer0_cb(void * param)
 {
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
-    OsalEventSet(p->task_id, MAIN_EVENT_TIMER0);
     main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
     if(pmsg)
     {
@@ -50,13 +49,13 @@ static void Timer0_cb(void * param)
     {
         AppDebugPrintf("%s timer0 msg alloc failed\n", __func__);
     }
+    OsalEventSet(p->task_id, MAIN_EVENT_TIMER0);
 }
 
 static void Timer1_cb(void * param)
 {
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
-    OsalEventSet(p->task_id, MAIN_EVENT_TIMER1);
     main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
     AppDebugPrintf("%s: msg alloc=%08x\n", __func__, (uint32_t)pmsg);
     if(pmsg)
@@ -72,13 +71,13 @@ static void Timer1_cb(void * param)
     {
         AppDebugPrintf("%s timer1 msg alloc failed\n", __func__);
     }
+    OsalEventSet(p->task_id, MAIN_EVENT_TIMER1);
 }
 
 static void Timer2_cb(void * param)
 {
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
-    OsalEventSet(p->task_id, MAIN_EVENT_TIMER2);
     
     main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
     if(pmsg)
@@ -95,13 +94,13 @@ static void Timer2_cb(void * param)
         AppDebugPrintf("%s timer2 msg alloc failed\n", __func__);
     }
     OsalMemFree(param);
+    OsalEventSet(p->task_id, MAIN_EVENT_TIMER2);
 }
 
 static void Timer3_cb(void * param)
 {
     timer_cb_param_t *p = (timer_cb_param_t *)param;
     AppDebugPrintf("%s: task_id=%u param=%08x\n", __func__, p->task_id, (uint32_t)param);
-    OsalEventSet(p->task_id, MAIN_EVENT_TIMER3);
     
     main_task_msg_t *pmsg = OsalMsgQueueAlloc(sizeof(main_task_msg_t));
     if(pmsg)
@@ -118,6 +117,7 @@ static void Timer3_cb(void * param)
         AppDebugPrintf("%s timer3 msg alloc failed\n", __func__);
     }
     OsalMemFree(param);
+    OsalEventSet(p->task_id, MAIN_EVENT_TIMER3);
 }
 
 static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
@@ -131,6 +131,11 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
         {
             AppDebugPrintf("%s:msg timer=%u index=%u\n", __func__, pmsg->timer, pmsg->index);
             OsalMsgQueueFree(pmsg);
+        }
+
+        if(timer_cnt[0] >= 5 && timer_cnt[1] >= 5 && timer_cnt[2] >= 5 &&timer_cnt[3] >= 5)
+        {
+            AppDebugPrintf("%s all timer end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(1024)));
         }
     }
 
@@ -263,8 +268,6 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             AppDebugPrintf("%s MAIN_EVENT_TIMER1: %u end\n", __func__, timer_cnt[1]);
             OsalMemFree(OsalTimerStop(pTimer1));
             OsalDeleteTimer(pTimer1);
-            
-            AppDebugPrintf("%s MAIN_EVENT_TIMER1 end malloc: 0x%08lx\n", __func__, (size_t)(OsalMemAlloc(100)));
         }
     }
 

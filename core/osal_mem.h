@@ -11,9 +11,9 @@ extern "C"
 #endif
 
 //==================================================================================================
-#define HEAP_ALIGNMENT				16
-#define HEAP_ALIGNMENT_SIZE         ((sizeof(osal_mem_t) < HEAP_ALIGNMENT) ? HEAP_ALIGNMENT : ((sizeof(osal_mem_t) + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1)))
-
+#define HEAP_ALIGNMENT_SIZE				4
+#define HEAP_HEAD_ALIGNMENT_SIZE        ((sizeof(osal_mem_t) < HEAP_ALIGNMENT_SIZE) ? HEAP_ALIGNMENT_SIZE : ((sizeof(osal_mem_t) + HEAP_ALIGNMENT_SIZE - 1) & ~(HEAP_ALIGNMENT_SIZE - 1)))
+  
 typedef struct OSAL_MEM_T
 {
 	struct OSAL_MEM_T *next;
@@ -23,7 +23,7 @@ typedef struct OSAL_MEM_T
 typedef union
 {
 	osal_mem_t mem;
-	uint8_t reserved[HEAP_ALIGNMENT_SIZE];
+	uint8_t reserved[HEAP_HEAD_ALIGNMENT_SIZE];
 }osal_mem_head_t;
 //==================================================================================================
 void * OsalMemAlloc(size_t size_req);
