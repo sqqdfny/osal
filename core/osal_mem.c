@@ -26,11 +26,14 @@ static osal_mem_head_t *g_pMemHead;
 	static void OsalMemPrintList(void)
 	{
 		osal_mem_head_t *p;
-		p = g_pMemHead;
-		do{
-			OsalMemDebugPrintf("%s:0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(p->mem.next));
-			p = (osal_mem_head_t*)(p->mem.next);
-		}while(p);
+		if(g_pMemHead)
+		{
+			p = g_pMemHead;
+			do{
+				OsalMemDebugPrintf("%s:0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(p->mem.next));
+				p = (osal_mem_head_t*)(p->mem.next);
+			}while(p);
+		}
 	}
 #else
 	#define OsalMemDebugPrintf(...)
@@ -43,6 +46,11 @@ void * OsalMemAlloc(size_t size_req)
     OsalMemDebugPrintf("%s: size_req=0x%04lx\n", __func__, size_req);
 	size_req = (size_req + HEAP_ALIGNMENT_SIZE - 1) & ~(HEAP_ALIGNMENT_SIZE - 1);
 	OsalMemEnterCritical();
+	if(NULL == g_pMemHead) 
+	{
+		OsalMemExitCritical();
+		return NULL;
+	}
 	OsalMemPrintList();
 	if(g_pMemHead->mem.size > (size_req + sizeof(osal_mem_head_t) * 2))
 	{
@@ -77,7 +85,6 @@ void * OsalMemAlloc(size_t size_req)
 		}
 	#endif 
 	}
-
 
 	prev = g_pMemHead;
 	p = (osal_mem_head_t*)(prev->mem.next);
@@ -122,6 +129,14 @@ void OsalMemFree(void* pMem)
     OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx 0x%08lx\n", __func__, (size_t)(p), p->mem.size, (size_t)(g_pMemHead));
 	OsalMemEnterCritical();
 	OsalMemPrintList();
+	if(NULL == g_pMemHead)
+	{
+		g_pMemHead = p;
+		g_pMemHead->mem.next = NULL;
+		OsalMemExitCritical();
+		return;
+	}
+	
 	if(p < g_pMemHead)
 	{
 		p->mem.next = (osal_mem_t*)g_pMemHead;
@@ -171,14 +186,18 @@ void OsalMemFree(void* pMem)
 void OsalMemInit(uint32_t * addr, size_t size_bytes)
 {	
 	uint8_t * addr_tmp;
-    if(NULL == addr) return;
+    if(NULL == addr) 
+	{
+		g_pMemHead = NULL;
+		return;
+	}
 	
 	addr_tmp = (uint8_t *)addr;
 	
-	if(((uint32_t)addr_tmp) & (HEAP_ALIGNMENT_SIZE - 1))
+	if(((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1))
 	{
-		addr_tmp += HEAP_ALIGNMENT_SIZE - (((uint32_t)addr_tmp) & (HEAP_ALIGNMENT_SIZE - 1));
-		size_bytes -= (((uint32_t)addr_tmp) & (HEAP_ALIGNMENT_SIZE - 1));
+		addr_tmp += HEAP_ALIGNMENT_SIZE - (((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
+		size_bytes -= (((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
 	}
 
 	g_pMemHead = (osal_mem_head_t *)addr_tmp;
