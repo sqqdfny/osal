@@ -27,9 +27,14 @@ typedef struct OSAL_TIMER_T
 }osal_timer_t;
 
 
+//timeout:定时器时间，单位ms
 osal_timer_t* OsalCreateTimer(osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param));
+
 void OsalDeleteTimer(osal_timer_t *pTimer);
-bool OsalTimerStart(osal_timer_t *pTimer, void *param);
+
+//timeout:定时器时间，单位ms，如果为0表示使用OsalCreateTimer()创建定时器时传入的参数
+bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param);
+
 void * OsalTimerStop(osal_timer_t *pTimer);
 
 void OsalUpdateTimers(void);

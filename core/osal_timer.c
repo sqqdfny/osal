@@ -86,12 +86,20 @@ void OsalDeleteTimer(osal_timer_t *pTimer)
     }
 }
 
-bool OsalTimerStart(osal_timer_t *pTimer, void *param)
+bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param)
 {
     bool result = false;
     if((NULL != pTimer) && (true != pTimer->is_running))
     {
         OsalEnterCritical();
+        if(timeout > 0)
+        {
+            pTimer->timeout = timeout;
+            if(pTimer->reload_timeout > 0)
+            {
+                pTimer->reload_timeout = timeout;
+            }
+        }
         pTimer->param = param;
         pTimer->is_running = true;
         result = true;

@@ -157,7 +157,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             pTimer0 = OsalCreateTimer(osal_timer_type_period, 1000, Timer0_cb);
             if(pTimer0)
             {
-                if(!OsalTimerStart(pTimer0, (void*)p))
+                if(!OsalTimerStart(pTimer0, 1000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START0 OsalTimerStart Failed\n", __func__);
@@ -181,7 +181,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             pTimer1 = OsalCreateTimer(osal_timer_type_period, 2000, Timer1_cb);
             if(pTimer1)
             {
-                if(!OsalTimerStart(pTimer1, (void*)p))
+                if(!OsalTimerStart(pTimer1, 2000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START1 OsalTimerStart Failed\n", __func__);
@@ -204,7 +204,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 1000, Timer2_cb);
             if(ptimer)
             {
-                if(!OsalTimerStart(ptimer, (void*)p))
+                if(!OsalTimerStart(ptimer, 1000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START2 OsalTimerStart Failed\n", __func__);
@@ -228,7 +228,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 2000, Timer3_cb);
             if(ptimer)
             {
-                if(!OsalTimerStart(ptimer, (void*)p))
+                if(!OsalTimerStart(ptimer, 2000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START3 OsalTimerStart Failed\n", __func__);
@@ -286,7 +286,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 1000, Timer2_cb);
             if(ptimer)
             {
-                if(!OsalTimerStart(ptimer, (void*)p))
+                if(!OsalTimerStart(ptimer, 1000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START2 OsalTimerStart Failed\n", __func__);
@@ -318,7 +318,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
             osal_timer_t * ptimer = OsalCreateTimer(osal_timer_type_one_shot, 2000, Timer3_cb);
             if(ptimer)
             {
-                if(!OsalTimerStart(ptimer, (void*)p))
+                if(!OsalTimerStart(ptimer, 2000, (void*)p))
                 {
                     OsalMemFree((void*)p);
                     AppDebugPrintf("%s MAIN_EVENT_START3 OsalTimerStart Failed\n", __func__);

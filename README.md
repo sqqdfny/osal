@@ -74,6 +74,7 @@
 
 3.定时器
   创建定时器,成功返回定时器句柄指针,创建成功之后为停止状态
+  timeout:定时器时间，单位ms
   osal_timer_t* OsalCreateTimer(osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param));
   
   删除定时器
@@ -81,7 +82,8 @@
 
   启动定时器,param为传递给回调的参数
   如果传递给回调的参数为内存块,用户需要自己管理内存块的回收
-  bool OsalTimerStart(osal_timer_t *pTimer, void *param);
+  timeout:定时器时间，单位ms，如果为0表示使用OsalCreateTimer()创建定时器时传入的参数
+  bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param);
 
   停止定时器,返回OsalTimerStart()函数传递给定时器的参数
   此函数在定时器删除前可多次调用
