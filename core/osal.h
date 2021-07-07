@@ -14,6 +14,7 @@ extern "C"
 {
 #endif
 
+#define OSAL_VERSION    "2021.7.7.0"
 //==================================================================================================
 typedef struct 
 {
@@ -38,6 +39,8 @@ void OsalStartSystem(void);
  *        如果不使用 msg_queue, 同时用户也不调用内存管理相关的函数, 可以传入NULL
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes);
+
+#define OsalGetVersionStr()  OSAL_VERSION
 //==================================================================================================
 #ifdef __cplusplus
 }

@@ -360,7 +360,7 @@ int main()
 {
     
     OsalInitSystem(g_mem_buf, MEM_BUF_SIZE);
-
+    printf("OsalVersion:%s\n", OsalGetVersionStr());
     MainTaskInit();
 
     OsalStartSystem();
