@@ -4,6 +4,7 @@
  *        消息队列使用了osal_mem.c提供的接口函数,共用了相关的数据结构.
  * @date 2021-06-09
  * @author sqqdfny
+ *         sqqdfny@163.com
  */
 
 #include "osal_msg_queue.h"

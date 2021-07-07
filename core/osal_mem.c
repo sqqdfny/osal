@@ -3,6 +3,7 @@
  * @brief 内存管理,支持指定字节对齐,回收时会将相邻的内存块合并
  * @date 2021-06-09
  * @author sqqdfny
+ *         sqqdfny@163.com
  */
 
 #include "osal_typedef.h"

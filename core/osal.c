@@ -3,6 +3,7 @@
  * @brief OSAL message loop
  * @date 2021-06-08
  * @author sqqdfny
+ *         sqqdfny@163.com
  */
 
 #include "osal.h"

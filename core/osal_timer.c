@@ -3,6 +3,7 @@
  * @brief OSAL对外提供的定时器接口
  * @date 2021-06-08
  * @author sqqdfny
+ *         sqqdfny@163.com
  */
 
 #include "osal_timer.h"
