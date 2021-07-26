@@ -119,10 +119,10 @@ void OsalInitSystem(uint32_t * addr, size_t size_bytes)
         g_osal_tcb_list[i].queue = NULL;
         g_osal_tcb_list[i].events = 0;
     }
+    OsalExitCritical();
 
     OsalMemInit(addr, size_bytes);
     OsalTimerInit();
-    OsalExitCritical();
 }
 //==================================================================================================
 //end files

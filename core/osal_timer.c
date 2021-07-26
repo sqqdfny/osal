@@ -70,7 +70,7 @@ osal_timer_t* OsalCreateTimer(osal_timer_type_t type, uint32_t timeout, void (*c
     pTimer->timeout = timeout;
     pTimer->callback = callback;
     pTimer->param = NULL;
-    pTimer->reload_timeout = (osal_timer_type_period == type) ? timeout : 0;
+    pTimer->reload_timeout = (osal_timer_type_period == type) ? (timeout ? timeout : ~0) : 0;
     pTimer->is_running = false;
     AddTimerToUsedList(pTimer);
     OsalExitCritical();

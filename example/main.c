@@ -154,7 +154,7 @@ static osal_event_t MainTask(osal_task_id_t task_id, osal_event_t events)
         if(NULL != p)
         {
             p->task_id = task_id;
-            pTimer0 = OsalCreateTimer(osal_timer_type_period, 1000, Timer0_cb);
+            pTimer0 = OsalCreateTimer(osal_timer_type_period, 0, Timer0_cb);
             if(pTimer0)
             {
                 if(!OsalTimerStart(pTimer0, 1000, (void*)p))
