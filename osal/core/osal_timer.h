@@ -4,35 +4,40 @@
 #define __OSAL_TIMER_H__
 
 #include "osal.h"
+#include "osal_list.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 //==================================================================================================
-typedef enum
-{
-    osal_timer_type_period = 0,
-    osal_timer_type_one_shot,
-}osal_timer_type_t;
+#define OSAL_TIEMR_ONE_SHOT   0
+#define OSAL_TIMER_PERIOD     1
 
 typedef struct OSAL_TIMER_T
 {
-    struct OSAL_TIMER_T *next;
-    uint32_t timeout;               //ms
-    uint32_t reload_timeout;        //0表示是单次定时器
+    struct list_head list;          //used for timer manager
+    uint32_t timeout;               //unit:ms 
+    uint32_t reload_timeout;        //0 means one-shot
     void *param;
     void (*callback)(void *param);
     bool is_running;
 }osal_timer_t;
 
+#define INIT_OSAL_TIMER(timer, type, cb) \
+        do{ \
+            INIT_LIST_HEAD(&((timer)->list)); \
+            (timer)->timeout = 0; \
+            (timer)->reload_timeout = type; \
+            (timer)->param = NULL; \
+            (timer)->callback = cb; \
+            (timer)->is_running = false; \
+        } while(0)
 
-//timeout:定时器时间，单位ms
-osal_timer_t* OsalCreateTimer(osal_timer_type_t type, uint32_t timeout, void (*callback)(void *param));
+void OsalCreateTimer(osal_timer_t *pTimer);
 
 void OsalDeleteTimer(osal_timer_t *pTimer);
 
-//timeout:定时器时间，单位ms，如果为0表示使用OsalCreateTimer()创建定时器时传入的参数
 bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param);
 
 void * OsalTimerStop(osal_timer_t *pTimer);

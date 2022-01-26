@@ -62,7 +62,7 @@ void OsalHalTimerTickInit(void)
         perror("Create hal timer error");
         exit(1);
     }
-    printf("Init hal timer ok !\n");
+    printf("Init hal timer ok!\n");
 }
 
 /**
@@ -83,10 +83,11 @@ void OsalHalTimerTickStop(void)
 
 /**
  * @brief 没有任务执行时CPU调用的函数
+ * 空闲时尽量让core进入休眠
  */
 void OsalHalt(void)
 {
-
+    usleep(1);
 }
 //==================================================================================================
 //end files

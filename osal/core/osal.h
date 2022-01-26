@@ -7,28 +7,33 @@
 #include "osal_typedef.h"
 #include "osal_timer.h"
 #include "osal_mem.h"
-#include "osal_msg_queue.h"
+#include "osal_list.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#define OSAL_VERSION    "2021.7.7.0"
+#define OSAL_VERSION    "V2.0"
+
+#define OSAL_MSG_POOL_SIZE      32
+ 
+#define OSAL_MSG_TASK_CREATED   0     
+#define OSAL_MSG_USR_BASE       10
 //==================================================================================================
-typedef struct 
+typedef struct osal_tcb
 {
-    osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events);
-    void *queue;
-    osal_event_t events;
+    struct list_head list;          //used for task manager
+    struct list_head msgQueue;      //used for task massge queue
+    void (*pFun)(osal_msg_cmd_t cmd, void *param);
 }osal_tcb_t;
 //==================================================================================================
-typedef uint32_t (*OsalTaskFun_p)(osal_task_id_t task_id);
+#define INIT_OSAL_TCB(tcb, fun)  do{ (tcb)->pFun = fun; }while(0)
 
-void OsalEventSet(osal_task_id_t task_id, osal_event_t events);
-void OsalEventClear(osal_task_id_t task_id, osal_event_t events);
+OSAL_ERR_T OsalPostMsg(osal_tcb_t *pTcb, osal_msg_cmd_t cmd, void *param);
+#define OsalPostMsgIsr(tcb, param)  OsalPostMsg(tcb, param)
 
-OSAL_ERR_T OsalAddTask(osal_task_id_t *pTaskId, osal_event_t (*pProcess)(osal_task_id_t task_id, osal_event_t events));
+void OsalAddTask(osal_tcb_t *pTcb);
 void OsalStartSystem(void);
 
 
@@ -39,8 +44,6 @@ void OsalStartSystem(void);
  *        如果不使用 msg_queue, 同时用户也不调用内存管理相关的函数, 可以传入NULL
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes);
-
-#define OsalGetVersionStr()  OSAL_VERSION
 //==================================================================================================
 #ifdef __cplusplus
 }

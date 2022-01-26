@@ -23,7 +23,7 @@
 static osal_mem_head_t *g_pMemHead;
 //==================================================================================================
 #ifdef OSAL_MEM_DEBUG_EN
-	#define OsalMemDebugPrintf(fmt, args...)  OsalDebugInfo(fmt, ##args)
+	#define OsalMemDebugPrintf(fmt, args...)  OsLogInfo(fmt, ##args)
 	static void OsalMemPrintList(void)
 	{
 		osal_mem_head_t *p;
@@ -177,7 +177,7 @@ void OsalMemFree(void* pMem)
 		prev = (osal_mem_head_t*)prev->mem.next;
 	}while(NULL != prev);
 	OsalMemExitCritical();
-	OsalDebugErr("%s err\n", __func__);
+	OsLogErr("%s err\n", __func__);
 }
 
 /**

@@ -2,7 +2,7 @@
 
 DIR_CROSS =
 C_CC = $(DIR_CROSS)gcc
-C_FLAGS = $(DEBUG) -Wall -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+C_FLAGS = $(DEBUG) -Wall -g -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 
 
 DirRoot    = ../
@@ -13,7 +13,7 @@ DirLib     =
 #source file
 #源文件，自动找所有.c，
 SOURCES_C =  $(wildcard $(DirApp)*.c)
-include $(DirRoot)component.mk
+include $(DirRoot)osal/component.mk
 
 #将目标定义为同名.o文件
 OBJS =  $(patsubst $(DirRoot)%.c,$(DirObjRoot)%.o,${SOURCES_C})

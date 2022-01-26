@@ -63,9 +63,8 @@ typedef enum
 	#define NULL 	0
 #endif
 //==================================================================================================
-typedef uint32_t osal_task_id_t;
 typedef uint32_t osal_system_tick_t;
-typedef uint32_t osal_event_t;
+typedef uint32_t osal_msg_cmd_t;
 
 
 //==================================================================================================
@@ -73,8 +72,8 @@ typedef uint32_t osal_event_t;
 #define OsalExitCritical()    OSAL_HAL_EXIT_CRITICAL()
 
 
-#define OsalDebugInfo(fmt, args...) printf("osal info:" fmt, ##args)
-#define OsalDebugErr(fmt, args...)  printf("osal err:" fmt, ##args)
+#define OsLogInfo(fmt, args...) printf("osal info:" fmt, ##args)
+#define OsLogErr(fmt, args...)  printf("osal err:" fmt, ##args)
 //==================================================================================================
 #ifdef __cplusplus
 }
