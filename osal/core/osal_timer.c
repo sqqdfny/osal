@@ -17,21 +17,21 @@
 static LIST_HEAD(sg_osal_timer_list);
 static osal_system_tick_t g_old_tick;
 //==================================================================================================
-void OsalCreateTimer(osal_timer_t *pTimer)
+void OsalCreateTimer(struct osal_timer *pTimer)
 {
     OsalTimerEnterCritical();
     list_add_tail(&(pTimer->list), &sg_osal_timer_list);
     OsalTimerExitCritical();
 }
 
-void OsalDeleteTimer(osal_timer_t *pTimer)
+void OsalDeleteTimer(struct osal_timer *pTimer)
 {
     OsalTimerEnterCritical();
     list_del(&(pTimer->list));
     OsalTimerExitCritical();
 }
 
-bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param)
+bool OsalTimerStart(struct osal_timer *pTimer, uint32_t timeout, void *param)
 {
     bool result = false;
     if((NULL != pTimer) && (!pTimer->is_running))
@@ -53,7 +53,7 @@ bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param)
     return result;
 }
 
-void * OsalTimerStop(osal_timer_t *pTimer)
+void * OsalTimerStop(struct osal_timer *pTimer)
 {
     void *param = NULL;
     if(NULL != pTimer) 
@@ -69,7 +69,7 @@ void * OsalTimerStop(osal_timer_t *pTimer)
 void OsalUpdateTimers(void)
 {
     struct list_head *pListHead;
-    osal_timer_t *pTimer;
+    struct osal_timer *pTimer;
     osal_system_tick_t tick = OsalHalGetCurSystemTick();
     uint32_t ms = tick - g_old_tick;
 
@@ -80,7 +80,7 @@ void OsalUpdateTimers(void)
         ms = ms * OSAL_MS_PER_TICK;
         list_for_each(pListHead, &sg_osal_timer_list)
         {
-            pTimer = list_entry(pListHead, osal_timer_t, list);
+            pTimer = list_entry(pListHead, struct osal_timer, list);
             if(pTimer->is_running)
             {
                 pTimer->timeout = (pTimer->timeout > ms) ? (pTimer->timeout - ms) : 0;

@@ -14,7 +14,7 @@ extern "C"
 #define OSAL_TIEMR_ONE_SHOT   0
 #define OSAL_TIMER_PERIOD     1
 
-typedef struct OSAL_TIMER_T
+struct osal_timer
 {
     struct list_head list;          //used for timer manager
     uint32_t timeout;               //unit:ms 
@@ -22,7 +22,7 @@ typedef struct OSAL_TIMER_T
     void *param;
     void (*callback)(void *param);
     bool is_running;
-}osal_timer_t;
+};
 
 #define INIT_OSAL_TIMER(timer, type, cb) \
         do{ \
@@ -34,13 +34,13 @@ typedef struct OSAL_TIMER_T
             (timer)->is_running = false; \
         } while(0)
 
-void OsalCreateTimer(osal_timer_t *pTimer);
+void OsalCreateTimer(struct osal_timer *pTimer);
 
-void OsalDeleteTimer(osal_timer_t *pTimer);
+void OsalDeleteTimer(struct osal_timer *pTimer);
 
-bool OsalTimerStart(osal_timer_t *pTimer, uint32_t timeout, void *param);
+bool OsalTimerStart(struct osal_timer *pTimer, uint32_t timeout, void *param);
 
-void * OsalTimerStop(osal_timer_t *pTimer);
+void * OsalTimerStop(struct osal_timer *pTimer);
 
 void OsalUpdateTimers(void);
 void OsalTimerInit(void);

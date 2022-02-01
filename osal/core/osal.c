@@ -33,13 +33,14 @@ static void OsalMsgPoolInit(void)
     }
 }
 //==================================================================================================
-OSAL_ERR_T OsalPostMsg(osal_tcb_t *pTcb, osal_msg_cmd_t cmd, void *param)
+OSAL_ERR_T OsalPostMsg(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param)
 {
     struct osal_msg_head * msg_head;
     OsalEnterCritical();
     if(list_empty(&sg_osal_msg_head_list))
     {
         OsalExitCritical();
+        OsLogErr("%s/%s[%d]: no mem!!!", __FILE__, __FUNCTION__, __LINE__);
         return OSAL_ERR_NO_MEM;
     }
 
@@ -52,7 +53,7 @@ OSAL_ERR_T OsalPostMsg(osal_tcb_t *pTcb, osal_msg_cmd_t cmd, void *param)
     return OSAL_ERR_SUCC;
 }
 
-void OsalAddTask(osal_tcb_t *pTcb)
+void OsalAddTask(struct osal_tcb *pTcb)
 {
     INIT_LIST_HEAD(&(pTcb->msgQueue));
     list_add_tail(&(pTcb->list), &sg_osal_tcb_list);
@@ -73,7 +74,7 @@ void OsalStartSystem(void)
         {
             list_for_each(pTaskListHead, &sg_osal_tcb_list)
             {
-                pTcb = list_entry(pTaskListHead, osal_tcb_t, list);
+                pTcb = list_entry(pTaskListHead, struct osal_tcb, list);
                 if(!list_empty(&(pTcb->msgQueue)))
                 {
                     OsalEnterCritical();

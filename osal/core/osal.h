@@ -15,25 +15,23 @@ extern "C"
 #endif
 
 #define OSAL_VERSION    "V2.0"
-
-#define OSAL_MSG_POOL_SIZE      32
  
 #define OSAL_MSG_TASK_CREATED   0     
 #define OSAL_MSG_USR_BASE       10
 //==================================================================================================
-typedef struct osal_tcb
+struct osal_tcb
 {
     struct list_head list;          //used for task manager
     struct list_head msgQueue;      //used for task massge queue
     void (*pFun)(osal_msg_cmd_t cmd, void *param);
-}osal_tcb_t;
+};
 //==================================================================================================
 #define INIT_OSAL_TCB(tcb, fun)  do{ (tcb)->pFun = fun; }while(0)
 
-OSAL_ERR_T OsalPostMsg(osal_tcb_t *pTcb, osal_msg_cmd_t cmd, void *param);
+OSAL_ERR_T OsalPostMsg(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param);
 #define OsalPostMsgIsr(tcb, param)  OsalPostMsg(tcb, param)
 
-void OsalAddTask(osal_tcb_t *pTcb);
+void OsalAddTask(struct osal_tcb *pTcb);
 void OsalStartSystem(void);
 
 

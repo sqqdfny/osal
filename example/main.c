@@ -12,42 +12,35 @@
 #define MSG_TIMER3  (OSAL_MSG_USR_BASE + 3)
 //==================================================================================================
 
-static osal_tcb_t sg_tcb;
-static osal_timer_t timer[4];
+static struct osal_tcb sg_tcb;
+static struct osal_timer timer[4];
 static uint32_t timer_cnt[4] = {0, 0, 0, 0};
-
-typedef struct 
-{
-    uint32_t timer;
-    uint32_t index;
-    uint8_t buf[37];
-}main_task_msg_t;
 
 static void Timer0_cb(void * param)
 {
     OsLogInfo("%s: %u\n", __FUNCTION__, *((uint32_t *)param));
-    OsalPostMsg(&sg_tcb, MSG_TIMER0, param);
+    OsalPostMsg(&sg_tcb, MSG_TIMER0, (void*)(*((uint32_t *)param)));
     (*((uint32_t *)param)) ++;
 }
 
 static void Timer1_cb(void * param)
 {
     OsLogInfo("%s: %u\n", __FUNCTION__, *((uint32_t *)param));
-    OsalPostMsg(&sg_tcb, MSG_TIMER1, param);
+    OsalPostMsg(&sg_tcb, MSG_TIMER1, (void*)(*((uint32_t *)param)));
     (*((uint32_t *)param)) ++;
 }
 
 static void Timer2_cb(void * param)
 {
     OsLogInfo("%s: %u\n", __FUNCTION__, *((uint32_t *)param));
-    OsalPostMsg(&sg_tcb, MSG_TIMER2, param);
+    OsalPostMsg(&sg_tcb, MSG_TIMER2, (void*)(*((uint32_t *)param)));
     (*((uint32_t *)param)) ++;
 }
 
 static void Timer3_cb(void * param)
 {
     OsLogInfo("%s: %u\n", __FUNCTION__, *((uint32_t *)param));
-    OsalPostMsg(&sg_tcb, MSG_TIMER3, param);
+    OsalPostMsg(&sg_tcb, MSG_TIMER3, (void*)(*((uint32_t *)param)));
     (*((uint32_t *)param)) ++;
 }
 
@@ -59,16 +52,16 @@ static void MainTask(osal_msg_cmd_t cmd, void *param)
             OsLogInfo("%s recv:OSAL_MSG_TASK_CREATED\n", __FUNCTION__);
             break;
         case MSG_TIMER0:
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, *((uint32_t *)param));
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
             break;
         case MSG_TIMER1:
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, *((uint32_t *)param));
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
             break;
         case MSG_TIMER2:
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, *((uint32_t *)param));
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
             break;
         case MSG_TIMER3:
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, *((uint32_t *)param));
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
             break;
         default:;
     }

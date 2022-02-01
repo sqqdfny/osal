@@ -1,16 +1,13 @@
 /**
  * @file osal_config.h
  * @brief 系统配置,定时器数量,队列数量等
- * @date 2021-06-08
+ * @date 2022-1-27
  * @author sqqdfny
  */
-#define OSAL_TASK_NUM       2    //系统最大支持的任务个数,最小值为1
-
-#define OSAL_TIMERS_NUM     8    //系统最大支持的定时器个数,最小值为2
-#if (OSAL_TIMERS_NUM < 2)
-    #error "OSAL_TIMERS_NUM must equal or more than 2!!!"
+#define OSAL_MSG_POOL_SIZE      32  //用于向任务发送消息的消息池SIZE
+#if (OSAL_MSG_POOL_SIZE < 8)
+    #error "OSAL_MSG_POOL_SIZE must equal or more than 8!!!"
 #endif
-
 
 #ifndef __OSAL_CONFIG_H__
 #define __OSAL_CONFIG_H__
