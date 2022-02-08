@@ -29,7 +29,7 @@ struct osal_tcb
 #define INIT_OSAL_TCB(tcb, fun)  do{ (tcb)->pFun = fun; }while(0)
 
 OSAL_ERR_T OsalPostMsg(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param);
-#define OsalPostMsgIsr(tcb, param)  OsalPostMsg(tcb, param)
+#define OsalPostMsgIsr(pTcb, cmd, param)  OsalPostMsg(pTcb, cmd, param)
 
 void OsalAddTask(struct osal_tcb *pTcb);
 void OsalStartSystem(void);
