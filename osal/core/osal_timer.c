@@ -37,14 +37,12 @@ bool OsalTimerStart(struct osal_timer *pTimer, uint32_t timeout, void *param)
     if((NULL != pTimer) && (!pTimer->is_running))
     {
         OsalTimerEnterCritical();
-        if(timeout > 0)
+        pTimer->timeout = timeout;
+        if(pTimer->reload_timeout > 0)
         {
-            pTimer->timeout = timeout;
-            if(pTimer->reload_timeout > 0)
-            {
-                pTimer->reload_timeout = timeout;
-            }
+            pTimer->reload_timeout = timeout;
         }
+        
         pTimer->param = param;
         pTimer->is_running = true;
         result = true;
