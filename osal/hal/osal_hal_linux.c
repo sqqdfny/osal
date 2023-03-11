@@ -1,12 +1,13 @@
 /**
  * @file osal_hal.c
  * @brief 硬件操作层的实现，包括定时器和中断控制相关，移植时需要修改该文件
- *        本实例为LINUX下的实现
+ *        本文件为 LINUX 模拟实现
  * @date 2021-06-08
  * @author sqqdfny
  *         sqqdfny@163.com
  */
-
+#ifdef USED_PLATFORM_LINUX_SIMULATOR
+//==================================================================================================
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,7 +17,22 @@
 
 #include "osal_hal.h"
 
+static uint32_t g_enter_critical_count = 0;
 static osal_system_tick_t g_system_tick;
+//==================================================================================================
+void OSAL_HAL_DISABLE_ALL_INTERRUPT(void)  
+{  
+	g_enter_critical_count ++;
+}
+
+void OSAL_HAL_ENABLE_ALL_INTERRUPT(void)
+{
+	g_enter_critical_count ? (g_enter_critical_count --) : 0;
+	if(0 == g_enter_critical_count)
+	{
+		
+	}
+}
 //==================================================================================================
 //此处添加硬件定时器中断溢出函数，中断周期1～10ms
 
@@ -90,4 +106,5 @@ void OsalHalt(void)
     usleep(1);
 }
 //==================================================================================================
+#endif //USED_PLATFORM_LINUX_SIMULATOR
 //end files

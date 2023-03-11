@@ -13,11 +13,7 @@
 
 
 #define OSAL_MEM_DEBUG_EN 
-#undef OSAL_MEM_DEBUG_EN
-
-
-#define OsalMemEnterCritical()		OsalEnterCritical()		
-#define OsalMemExitCritical()		OsalExitCritical()		
+#undef OSAL_MEM_DEBUG_EN	
 				
 
 static osal_mem_head_t *g_pMemHead;
@@ -70,7 +66,7 @@ void * OsalMemAlloc(size_t size_req)
 	{
 		p = g_pMemHead;
 		g_pMemHead = (osal_mem_head_t*)(g_pMemHead->mem.next);
-		p->mem.next = NULL
+		p->mem.next = NULL;
 		OsalMemExitCritical();
 		OsalMemDebugPrintf("%s: 0x%08lx 0x%08lx 0x%04lx\n", __func__, (size_t)(p), (size_t)(g_pMemHead), size_req);
 		return (p + 1);

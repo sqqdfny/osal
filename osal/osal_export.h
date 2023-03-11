@@ -4,10 +4,10 @@
 #ifndef __OSAL_EXPORT_H__
 #define __OSAL_EXPORT_H__
 
-
 #include "core/osal.h"
 #include "core/osal_timer.h"
 #include "core/osal_mem.h"
+#include "hal/osal_hal.h"
 
 #ifdef __cplusplus
 extern "C"

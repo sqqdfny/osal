@@ -13,43 +13,29 @@
 #include "../hal/osal_hal.h"
 
 
-typedef struct osal_msg_head
-{
-    struct list_head list;
-    osal_msg_cmd_t cmd;
-    void *param;
-}osal_msg_head_t;
-
 static LIST_HEAD(sg_osal_tcb_list);
-static LIST_HEAD(sg_osal_msg_head_list);
-static struct osal_msg_head sg_msg_head_pool[OSAL_MSG_POOL_SIZE];
-//==================================================================================================
-static void OsalMsgPoolInit(void)
-{
-    int i;
-    for(i = 0; i < OSAL_MSG_POOL_SIZE; i ++)
-    {
-        list_add_tail(&(sg_msg_head_pool[i].list), &sg_osal_msg_head_list);
-    }
-}
 //==================================================================================================
 OSAL_ERR_T OsalPostMsg(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param)
 {
+		if(NULL == param) { return OSAL_ERR_INVALID_HANDLE; }
+		
     struct osal_msg_head * msg_head;
-    OsalEnterCritical();
-    if(list_empty(&sg_osal_msg_head_list))
-    {
-        OsalExitCritical();
-        OsLogErr("%s/%s[%d]: no mem!!!", __FILE__, __FUNCTION__, __LINE__);
-        return OSAL_ERR_NO_MEM;
-    }
-
-    msg_head = list_first_entry(&sg_osal_msg_head_list, struct osal_msg_head, list);
-    list_del(&(msg_head->list));
+    OsalDisableAllInterrupt();
+		msg_head = (struct osal_msg_head *)param;
     msg_head->cmd = cmd;
-    msg_head->param = param;
     list_add_tail(&(msg_head->list), &(pTcb->msgQueue));
-    OsalExitCritical();
+    OsalResumeAllInterrupt();
+    return OSAL_ERR_SUCC;
+}
+
+OSAL_ERR_T OsalPostMsgIsr(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param)
+{
+    struct osal_msg_head * msg_head;
+    OsalDisableAllInterrupt();
+		msg_head = (struct osal_msg_head *)param;
+    msg_head->cmd = cmd;
+    list_add_tail(&(msg_head->list), &(pTcb->msgQueue));
+    OsalResumeAllInterrupt();
     return OSAL_ERR_SUCC;
 }
 
@@ -57,7 +43,8 @@ void OsalAddTask(struct osal_tcb *pTcb)
 {
     INIT_LIST_HEAD(&(pTcb->msgQueue));
     list_add_tail(&(pTcb->list), &sg_osal_tcb_list);
-    OsalPostMsg(pTcb, OSAL_MSG_TASK_CREATED, NULL);
+		osal_msg_head_t * pMsg = OsalMemAlloc(sizeof(osal_msg_head_t));
+    OsalPostMsg(pTcb, OSAL_MSG_TASK_CREATED, pMsg);
 }
 
 void OsalStartSystem(void)
@@ -77,21 +64,24 @@ void OsalStartSystem(void)
                 pTcb = list_entry(pTaskListHead, struct osal_tcb, list);
                 if(!list_empty(&(pTcb->msgQueue)))
                 {
-                    OsalEnterCritical();
+                    OsalDisableAllInterrupt();
                     list_for_each_safe(pMsgHead, pMsgTmp, &(pTcb->msgQueue))
                     {
-                        list_del(pMsgHead);
+                        list_del_init(pMsgHead);
                         if(NULL != pTcb->pFun)
                         {
                             cmd = list_entry(pMsgHead, struct osal_msg_head, list)->cmd;
-                            param = list_entry(pMsgHead, struct osal_msg_head, list)->param;
-                            list_add(pMsgHead, &sg_osal_msg_head_list);
-                            OsalExitCritical();
-                            pTcb->pFun(cmd, param);
-                            OsalEnterCritical();
+                            param = pMsgHead;
+                            OsalResumeAllInterrupt();
+							pTcb->pFun(cmd, (OSAL_MSG_TASK_CREATED == cmd) ? NULL : param);
+                            OsalDisableAllInterrupt();
+							if(OSAL_MSG_TASK_CREATED == cmd)
+							{
+								OsalMemFree(param);
                         }
                     }
-                    OsalExitCritical();
+                    }
+                    OsalResumeAllInterrupt();
                 }
             }
         }
@@ -104,11 +94,11 @@ void OsalStartSystem(void)
  * @brief OSAL系统初始化,
  *        传入的参数为内存管理的内存块地址和SIZE
  *        传入的addr要注意对齐的问题
- *        如果不调用内存管理相关的函数, 可以传入NULL
+ *        根据任务数量,size_bytes 最小为64
+ *        发送无参消息时需要申请一个消息块
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes)
 {
-    OsalMsgPoolInit();
     OsalMemInit(addr, size_bytes);
     OsalTimerInit();
 }

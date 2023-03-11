@@ -39,8 +39,12 @@ void OsalCreateTimer(struct osal_timer *pTimer);
 void OsalDeleteTimer(struct osal_timer *pTimer);
 
 bool OsalTimerStart(struct osal_timer *pTimer, uint32_t timeout, void *param);
+				
+void * OsalTimerReStart(struct osal_timer *pTimer, uint32_t timeout, void *param);
 
 void * OsalTimerStop(struct osal_timer *pTimer);
+				
+				
 
 void OsalUpdateTimers(void);
 void OsalTimerInit(void);
@@ -51,3 +55,4 @@ void OsalTimerInit(void);
 #endif //__OSAL_TIMER_H__
 //==================================================================================================
 //end files
+

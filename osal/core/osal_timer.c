@@ -10,10 +10,6 @@
 #include "osal_config.h"
 #include "../hal/osal_hal.h"
 
-
-#define OsalTimerEnterCritical()   //OsalEnterCritical()
-#define OsalTimerExitCritical()    //OsalExitCritical()
-
 static LIST_HEAD(sg_osal_timer_list);
 static osal_system_tick_t g_old_tick;
 //==================================================================================================
@@ -51,6 +47,26 @@ bool OsalTimerStart(struct osal_timer *pTimer, uint32_t timeout, void *param)
     return result;
 }
 
+void * OsalTimerReStart(struct osal_timer *pTimer, uint32_t timeout, void *param)
+{
+	void *para = NULL;
+	if(NULL != pTimer) 
+	{
+			OsalTimerEnterCritical();
+			pTimer->is_running = false;
+			pTimer->timeout = timeout;
+			if(pTimer->reload_timeout > 0)
+			{
+					pTimer->reload_timeout = timeout;
+			}
+			para = pTimer->param = param;
+			if(NULL != param) { pTimer->param = param; }
+			pTimer->is_running = true;
+			OsalTimerExitCritical();
+	}
+  return para;
+}
+
 void * OsalTimerStop(struct osal_timer *pTimer)
 {
     void *param = NULL;
@@ -70,6 +86,7 @@ void OsalUpdateTimers(void)
     struct osal_timer *pTimer;
     osal_system_tick_t tick = OsalHalGetCurSystemTick();
     uint32_t ms = tick - g_old_tick;
+    if(0 == ms) return;
 
     OsalTimerEnterCritical();
     g_old_tick = tick;
@@ -84,12 +101,6 @@ void OsalUpdateTimers(void)
                 pTimer->timeout = (pTimer->timeout > ms) ? (pTimer->timeout - ms) : 0;
                 if(0 == pTimer->timeout)
                 {
-                    if(pTimer->callback)
-                    {
-                        OsalTimerExitCritical();
-                        pTimer->callback(pTimer->param);
-                        OsalTimerEnterCritical();
-                    }
                     if(0 != pTimer->reload_timeout)
                     {//period
                         pTimer->timeout = pTimer->reload_timeout;
@@ -97,6 +108,12 @@ void OsalUpdateTimers(void)
                     else
                     {//one-shot
                         pTimer->is_running = false;
+                    }
+                    if(pTimer->callback)
+                    {
+                        OsalTimerExitCritical();
+                        pTimer->callback(pTimer->param);
+                        OsalTimerEnterCritical();
                     }
                 }
             }
