@@ -21,6 +21,9 @@ OBJS =  $(patsubst $(DirRoot)%.c,$(DirObjRoot)%.o,${SOURCES_C})
 #包含路径
 C_FLAGS += -I$(DirRoot)
 
+#宏定义
+C_FLAGS += DUSED_PLATFORM_LINUX_SIMULATOR
+
 #target you can change main to what you want
 TARGET = main
 
