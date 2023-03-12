@@ -17,11 +17,11 @@ static LIST_HEAD(sg_osal_tcb_list);
 //==================================================================================================
 OSAL_ERR_T OsalPostMsg(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param)
 {
-		if(NULL == param) { return OSAL_ERR_INVALID_HANDLE; }
+	if(NULL == param) { return OSAL_ERR_INVALID_HANDLE; }
 		
     struct osal_msg_head * msg_head;
     OsalDisableAllInterrupt();
-		msg_head = (struct osal_msg_head *)param;
+	msg_head = (struct osal_msg_head *)param;
     msg_head->cmd = cmd;
     list_add_tail(&(msg_head->list), &(pTcb->msgQueue));
     OsalResumeAllInterrupt();
@@ -32,7 +32,7 @@ OSAL_ERR_T OsalPostMsgIsr(struct osal_tcb *pTcb, osal_msg_cmd_t cmd, void *param
 {
     struct osal_msg_head * msg_head;
     OsalDisableAllInterrupt();
-		msg_head = (struct osal_msg_head *)param;
+	msg_head = (struct osal_msg_head *)param;
     msg_head->cmd = cmd;
     list_add_tail(&(msg_head->list), &(pTcb->msgQueue));
     OsalResumeAllInterrupt();
@@ -43,8 +43,11 @@ void OsalAddTask(struct osal_tcb *pTcb)
 {
     INIT_LIST_HEAD(&(pTcb->msgQueue));
     list_add_tail(&(pTcb->list), &sg_osal_tcb_list);
-		osal_msg_head_t * pMsg = OsalMemAlloc(sizeof(osal_msg_head_t));
-    OsalPostMsg(pTcb, OSAL_MSG_TASK_CREATED, pMsg);
+	osal_msg_head_t * pMsg = OsalMemAlloc(sizeof(osal_msg_head_t));
+    if(pMsg)
+    {
+        OsalPostMsg(pTcb, OSAL_MSG_TASK_CREATED, pMsg);
+    }
 }
 
 void OsalStartSystem(void)
@@ -78,8 +81,8 @@ void OsalStartSystem(void)
 							if(OSAL_MSG_TASK_CREATED == cmd)
 							{
 								OsalMemFree(param);
+                            }
                         }
-                    }
                     }
                     OsalResumeAllInterrupt();
                 }
@@ -95,7 +98,8 @@ void OsalStartSystem(void)
  *        传入的参数为内存管理的内存块地址和SIZE
  *        传入的addr要注意对齐的问题
  *        根据任务数量,size_bytes 最小为64
- *        发送无参消息时需要申请一个消息块
+ *        发送系统保留消息(eg:OSAL_MSG_TASK_CREATED)时需要申请一个消息块(sizeof(osal_msg_head_t))
+ *        如果没有足够的消息块,会导致系统保留消息发送不成功,但创建的TASK会照常运行
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes)
 {

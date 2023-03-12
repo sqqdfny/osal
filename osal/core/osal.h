@@ -17,7 +17,7 @@ extern "C"
 #define OSAL_VERSION    "V2.1"
  
 #define OSAL_MSG_TASK_CREATED   0     //这个消息由系统在创建任务时发送一次
-#define OSAL_MSG_USR_BASE       10
+#define OSAL_MSG_USR_BASE       10    //用户消息ID从这个数开始,前面为保留消息
 //==================================================================================================
 struct osal_tcb
 {
@@ -52,6 +52,9 @@ void OsalStartSystem(void);
  * @brief OSAL系统初始化,
  *        传入的参数为内存管理的内存块地址和SIZE
  *        传入的addr要注意对齐的问题
+ *        根据任务数量,size_bytes 最小为64
+ *        发送系统保留消息(eg:OSAL_MSG_TASK_CREATED)时需要申请一个消息块(sizeof(osal_msg_head_t))
+ *        如果没有足够的消息块,会导致系统保留消息发送不成功,但创建的TASK会照常运行
  */
 void OsalInitSystem(uint32_t * addr, size_t size_bytes);
 //==================================================================================================

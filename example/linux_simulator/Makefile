@@ -5,8 +5,8 @@ C_CC = $(DIR_CROSS)gcc
 C_FLAGS = $(DEBUG) -Wall -g -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 
 
-DirRoot    = ../
-DirApp     = $(DirRoot)example/
+DirRoot    = ../../
+DirApp     = $(DirRoot)linux_simulato/example/
 DirObjRoot = $(DirApp)obj/
 DirLib     = 
 
