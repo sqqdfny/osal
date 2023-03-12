@@ -71,8 +71,8 @@ typedef int8_t   osal_irq_mask_t;
 //==================================================================================================
 
 
-#define OsLogInfo(fmt, args...) //printf("osal info:" fmt, ##args)
-#define OsLogErr(fmt, args...)  //printf("osal err:" fmt, ##args)
+#define OsLogInfo(fmt, args...) printf("osal info:" fmt, ##args)
+#define OsLogErr(fmt, args...)  printf("osal err:" fmt, ##args)
 //==================================================================================================
 #ifdef __cplusplus
 }

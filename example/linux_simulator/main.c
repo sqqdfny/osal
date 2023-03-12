@@ -77,24 +77,32 @@ static void MainTask(osal_msg_cmd_t cmd, void *param)
             OsLogInfo("%s recv:OSAL_MSG_TASK_CREATED\n", __FUNCTION__);
             break;
         case MSG_TIMER0:
+        {
             struct TEST_TIMER_MSG_T * pMsg = (struct TEST_TIMER_MSG_T *)param;
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, pMsg->count);
             OsalMemFree(param);
+        }
             break;
         case MSG_TIMER1:
+        {
             struct TEST_TIMER_MSG_T * pMsg = (struct TEST_TIMER_MSG_T *)param;
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, pMsg->count);
             OsalMemFree(param);
+        }
             break;
         case MSG_TIMER2:
+        {
             struct TEST_TIMER_MSG_T * pMsg = (struct TEST_TIMER_MSG_T *)param;
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, pMsg->count);
             OsalMemFree(param);
+        }
             break;
         case MSG_TIMER3:
+        {
             struct TEST_TIMER_MSG_T * pMsg = (struct TEST_TIMER_MSG_T *)param;
-            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, (uint32_t)param);
+            OsLogInfo("%s recv:MSG_TIME%u %u\n", __FUNCTION__, cmd - OSAL_MSG_USR_BASE, pMsg->count);
             OsalMemFree(param);
+        }
             break;
         default:;
     }

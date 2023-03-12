@@ -6,7 +6,7 @@ C_FLAGS = $(DEBUG) -Wall -g -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
 
 
 DirRoot    = ../../
-DirApp     = $(DirRoot)linux_simulato/example/
+DirApp     = $(DirRoot)example/linux_simulator/
 DirObjRoot = $(DirApp)obj/
 DirLib     = 
 
@@ -22,7 +22,7 @@ OBJS =  $(patsubst $(DirRoot)%.c,$(DirObjRoot)%.o,${SOURCES_C})
 C_FLAGS += -I$(DirRoot)
 
 #宏定义
-C_FLAGS += DUSED_PLATFORM_LINUX_SIMULATOR
+C_FLAGS += -DUSED_PLATFORM_LINUX_SIMULATOR
 
 #target you can change main to what you want
 TARGET = main
