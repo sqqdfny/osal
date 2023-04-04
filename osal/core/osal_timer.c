@@ -82,7 +82,7 @@ void * OsalTimerStop(struct osal_timer *pTimer)
 //==================================================================================================
 void OsalUpdateTimers(void)
 {
-    struct list_head *pListHead;
+    struct list_head *pListHead, *pListTemp;
     struct osal_timer *pTimer;
     osal_system_tick_t tick = OsalHalGetCurSystemTick();
     uint32_t ms = tick - g_old_tick;
@@ -93,7 +93,7 @@ void OsalUpdateTimers(void)
     if((!list_empty(&sg_osal_timer_list)) && (ms > 0))
     {
         ms = ms * OSAL_MS_PER_TICK;
-        list_for_each(pListHead, &sg_osal_timer_list)
+        list_for_each_safe(pListHead, pListTemp, &sg_osal_timer_list)
         {
             pTimer = list_entry(pListHead, struct osal_timer, list);
             if(pTimer->is_running)
