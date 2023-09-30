@@ -191,10 +191,10 @@ void OsalMemInit(uint32_t * addr, size_t size_bytes)
 	
 	addr_tmp = (uint8_t *)addr;
 	
-	if(((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1))
+	if(((size_t)addr) & (HEAP_ALIGNMENT_SIZE - 1))
 	{
-		addr_tmp += HEAP_ALIGNMENT_SIZE - (((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
-		size_bytes -= (((uint32_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
+		addr_tmp += HEAP_ALIGNMENT_SIZE - (((size_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
+		size_bytes -= (((size_t)addr) & (HEAP_ALIGNMENT_SIZE - 1));
 	}
 
 	g_pMemHead = (osal_mem_head_t *)addr_tmp;

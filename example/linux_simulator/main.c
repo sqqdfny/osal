@@ -10,6 +10,8 @@
 #define MSG_TIMER1  (OSAL_MSG_USR_BASE + 1)
 #define MSG_TIMER2  (OSAL_MSG_USR_BASE + 2)
 #define MSG_TIMER3  (OSAL_MSG_USR_BASE + 3)
+
+static uint32_t sgCount = 0;
 //==================================================================================================
 struct TEST_TIMER_MSG_T
 {
