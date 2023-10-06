@@ -3,7 +3,7 @@
 
 example/linux_simulator 目录为一个基于linux编译和运行的示例程序，简单的演示了创建任务和定时器的使用，以及向任务发送消息。
 linux_simulator 编译步骤：
-1. cd example\linux_simulator  // 进行DEMO主目录
+1. cd example\linux_simulator  // 进入linux_simulator主目录
 2. mkdir build                 // 创建编译目录
 3. cd build                    // 进行编译目录
 4. cmake ..                    // 运行 Cmake
